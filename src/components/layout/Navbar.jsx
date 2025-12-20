@@ -1,16 +1,25 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, Hammer } from 'lucide-react';
+import { Menu, X, Phone, Hammer, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../ui/Button';
 import { cn } from '../../utils/cn';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isServicesOpen, setIsServicesOpen] = useState(false);
   const location = useLocation();
+
+  const servicesMenu = [
+    { name: 'Bathroom Tiling', path: '/services#bathroom' },
+    { name: 'Kitchen Splashbacks', path: '/services#kitchen' },
+    { name: 'Floor Tiling', path: '/services#floor' },
+    { name: 'Outdoor & Pools', path: '/services#outdoor' },
+    { name: 'Waterproofing', path: '/services#waterproofing' },
+  ];
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Services', path: '/services' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
@@ -48,6 +57,56 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Services Dropdown */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setIsServicesOpen(true)}
+              onMouseLeave={() => setIsServicesOpen(false)}
+            >
+              <Link
+                to="/services"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-accent flex items-center gap-1",
+                  isActive('/services') ? "text-accent" : "text-slate-600"
+                )}
+              >
+                Services
+                <ChevronDown className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  isServicesOpen && "rotate-180"
+                )} />
+              </Link>
+
+              <AnimatePresence>
+                {isServicesOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-slate-200 z-50"
+                    style={{ 
+                      transform: 'translateZ(0)',
+                      backfaceVisibility: 'hidden',
+                      perspective: 1000
+                    }}
+                  >
+                    <div className="py-2 overflow-hidden">
+                      {servicesMenu.map((service) => (
+                        <Link
+                          key={service.path}
+                          to={service.path}
+                          className="block px-4 py-3 text-sm font-medium text-slate-700 hover:bg-accent/5 hover:text-accent transition-colors duration-200 ease-in-out"
+                        >
+                          {service.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <div className="flex items-center gap-4 ml-4">
               <a href="tel:+61400000000" className="flex items-center gap-2 text-slate-600 hover:text-accent font-medium text-sm">
                 <Phone className="h-4 w-4" />
@@ -76,7 +135,67 @@ export function Navbar() {
       {isOpen && (
         <div className="md:hidden">
           <div className="pt-2 pb-3 space-y-1 px-4 sm:px-6">
-            {navLinks.map((link) => (
+            <Link
+              to="/"
+              onClick={() => setIsOpen(false)}
+              className={cn(
+                "block px-3 py-2 rounded-md text-base font-medium",
+                isActive('/')
+                  ? "bg-accent/10 text-accent"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              )}
+            >
+              Home
+            </Link>
+            
+            {/* Services Dropdown for Mobile */}
+            <div>
+              <button
+                onClick={() => setIsServicesOpen(!isServicesOpen)}
+                className={cn(
+                  "w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium",
+                  isActive('/services')
+                    ? "bg-accent/10 text-accent"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                )}
+              >
+                <span>Services</span>
+                <ChevronDown className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  isServicesOpen && "rotate-180"
+                )} />
+              </button>
+              
+              <AnimatePresence>
+                {isServicesOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pl-6 pt-1 space-y-1">
+                      {servicesMenu.map((service) => (
+                        <Link
+                          key={service.path}
+                          to={service.path}
+                          onClick={() => {
+                            setIsOpen(false);
+                            setIsServicesOpen(false);
+                          }}
+                          className="block px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200 ease-in-out"
+                        >
+                          {service.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {navLinks.slice(1).map((link) => (
               <Link
                 key={link.name}
                 to={link.path}
