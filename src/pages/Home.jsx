@@ -1,11 +1,61 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Clock, Award, Shield, ArrowRight, Star } from 'lucide-react';
+import { CheckCircle, Clock, Award, Shield, ArrowRight, Star, Bath, ChefHat, Grid3X3, Sun, Droplets, Wrench } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { services } from '../data/services';
+import { BentoGrid, BentoCard } from '../components/ui/bento-grid';
+import CaseStudies from '../components/ui/case-studies';
+import GalleryHoverCarousel from '../components/ui/gallery-hover-carousel';
 import { reviews } from '../data/reviews';
 import { projects } from '../data/projects';
 import tilingImage from '../assets/images/tiling.jpg';
+
+const features = [
+  {
+    Icon: Bath,
+    name: "Bathroom Tiling",
+    description: "Complete bathroom renovations and waterproofing from floor to ceiling.",
+    href: "/services#bathroom",
+    cta: "View Service",
+    background: <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Bathroom" />,
+    className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
+  },
+  {
+    Icon: ChefHat,
+    name: "Kitchen Splashbacks",
+    description: "Modern splashbacks to protect and style your cooking space.",
+    href: "/services#kitchen",
+    cta: "View Service",
+    background: <img src="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Kitchen" />,
+    className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
+  },
+  {
+    Icon: Grid3X3,
+    name: "Floor Tiling",
+    description: "Durable living area floors.",
+    href: "/services#floor",
+    cta: "View Service",
+    background: <img src="https://images.unsplash.com/photo-1484154218962-a1c002085d2f?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Floor" />,
+    className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
+  },
+  {
+    Icon: Sun,
+    name: "Outdoor & Pools",
+    description: "Slip-resistant outdoor paving.",
+    href: "/services#outdoor",
+    cta: "View Service",
+    background: <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Outdoor" />,
+    className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
+  },
+  {
+    Icon: Droplets,
+    name: "Waterproofing",
+    description: "Certified leak prevention.",
+    href: "/services#waterproofing",
+    cta: "View Service",
+    background: <img src="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Waterproofing" />,
+    className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
+  },
+];
 
 export function Home() {
   return (
@@ -38,7 +88,7 @@ export function Home() {
               </span>
             </h1>
             
-            <p className="text-sm text-slate-200 mb-10 leading-relaxed max-w-2xl font-light">
+            <p className="text-lg md:text-xl text-slate-200 mb-10 leading-relaxed max-w-2xl font-light">
               Transform your home with Australia's most trusted tiling experts. 
               From luxury bathroom renovations to durable outdoor paving, we deliver 
               flawless finishes guaranteed to last a lifetime.
@@ -85,32 +135,21 @@ export function Home() {
         </div>
       </section>
 
-      {/* Services Section */}
+      {/* Services Section - Bento Grid */}
       <section className="py-16 md:py-24 bg-slate-50">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Services</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Our Services</h2>
             <p className="text-slate-600 text-lg">
               From minor repairs to full renovations, we deliver quality that stands the test of time.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service) => (
-              <div key={service.id} className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow group">
-                <div className="bg-accent/10 w-14 h-14 rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent/20 transition-colors">
-                  <service.icon className="h-7 w-7 text-accent" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{service.title}</h3>
-                <p className="text-slate-600 mb-6 leading-relaxed">
-                  {service.description}
-                </p>
-                <Link to="/services" className="inline-flex items-center text-accent font-semibold hover:text-accent/80">
-                  Learn more <ArrowRight className="h-4 w-4 ml-2" />
-                </Link>
-              </div>
+          <BentoGrid className="lg:grid-rows-3">
+            {features.map((feature) => (
+              <BentoCard key={feature.name} {...feature} />
             ))}
-          </div>
+          </BentoGrid>
           
           <div className="mt-12 text-center">
             <Link to="/services">
@@ -123,93 +162,24 @@ export function Home() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
-            <div className="lg:w-1/2">
-              <img 
-                src="https://images.unsplash.com/photo-1584622050111-993a426fbf0a?auto=format&fit=crop&q=80&w=1000" 
-                alt="Tiler working" 
-                className="rounded-lg shadow-xl"
-              />
-            </div>
-            <div className="lg:w-1/2">
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
-                Why Homeowners Trust TrueLine
-              </h2>
-              <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="bg-green-100 p-3 rounded-full h-fit">
-                    <Clock className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-lg mb-1">On Time, Every Time</h4>
-                    <p className="text-slate-600">We respect your time. We show up when we say we will and finish on schedule.</p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="bg-blue-100 p-3 rounded-full h-fit">
-                    <Shield className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-lg mb-1">Quality Guaranteed</h4>
-                    <p className="text-slate-600">All our work complies with Australian Standards and comes with a 7-year workmanship warranty.</p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="bg-accent/20 p-3 rounded-full h-fit">
-                    <CheckCircle className="h-6 w-6 text-accent" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-lg mb-1">Transparent Pricing</h4>
-                    <p className="text-slate-600">No hidden costs. Detailed quotes provided upfront before any work begins.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <CaseStudies />
 
       {/* Featured Projects */}
-      <section className="py-16 bg-slate-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Recent Transformations</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {projects.slice(0, 3).map((project) => (
-              <div key={project.id} className="group overflow-hidden rounded-xl shadow-md">
-                <div className="relative h-64 overflow-hidden">
-                  <img 
-                    src={project.imageAfter} 
-                    alt={project.title} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                    <span className="text-white font-medium">View Project Details</span>
-                  </div>
-                </div>
-                <div className="bg-white p-6">
-                  <p className="text-sm text-accent font-semibold mb-2">{project.category} • {project.suburb}</p>
-                  <h3 className="text-xl font-bold text-slate-900">{project.title}</h3>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-10">
-            <Link to="/gallery">
-              <Button variant="outline">View Full Gallery</Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <GalleryHoverCarousel 
+        items={projects.map(p => ({
+          id: p.id,
+          title: p.title,
+          summary: p.description + " Located in " + p.suburb + ". Duration: " + p.duration,
+          url: "/gallery",
+          image: p.imageAfter
+        }))}
+      />
 
       {/* Reviews */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Client Feedback</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Client Feedback</h2>
             <div className="flex justify-center items-center gap-2 text-yellow-500 mb-2">
               <Star className="fill-current" />
               <Star className="fill-current" />
@@ -241,7 +211,7 @@ export function Home() {
       {/* CTA */}
       <section className="py-20 bg-primary text-white text-center">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to transform your space?</h2>
+          <h2 className="text-2xl font-bold mb-6">Ready to transform your space?</h2>
           <p className="text-lg text-slate-300 mb-8 max-w-2xl mx-auto">
             Book a free inspection or get a quote online in under 2 minutes. No obligation.
           </p>
