@@ -54,7 +54,7 @@ export function Navbar() {
                 <span>0400 000 000</span>
               </a>
               <Link to="/booking">
-                <Button>Book a Job</Button>
+                <Button className="bg-accent text-white hover:bg-yellow-600">Book a Job</Button>
               </Link>
             </div>
           </div>
@@ -98,7 +98,7 @@ export function Navbar() {
               </a>
               <div className="mt-3 px-3">
                 <Link to="/booking" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full">Book a Job</Button>
+                  <Button className="w-full bg-accent text-white hover:bg-yellow-600">Book a Job</Button>
                 </Link>
               </div>
             </div>

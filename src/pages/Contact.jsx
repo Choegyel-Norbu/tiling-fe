@@ -1,18 +1,15 @@
 import React from 'react';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { PageHeader } from '../components/layout/PageHeader';
 
 export function Contact() {
   return (
     <div className="bg-white min-h-screen">
-       <section className="bg-primary text-white py-16 text-center">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
-          <p className="text-lg text-slate-300">
-            Get in touch for quotes, questions, or advice.
-          </p>
-        </div>
-      </section>
+       <PageHeader 
+        title="Contact Us" 
+        description="Get in touch for quotes, questions, or advice."
+      />
 
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 gap-12">

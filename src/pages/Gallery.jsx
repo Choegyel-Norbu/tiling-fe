@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { projects } from '../data/projects';
 import { Button } from '../components/ui/Button';
+import { PageHeader } from '../components/layout/PageHeader';
 import { cn } from '../utils/cn';
 import { MapPin, Calendar, CheckCircle } from 'lucide-react';
 
@@ -16,14 +17,10 @@ export function Gallery() {
   return (
     <div className="bg-white min-h-screen">
       {/* Header */}
-      <section className="bg-primary text-white py-16 text-center">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Portfolio</h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-            Browse our recent projects and see the quality of our craftsmanship.
-          </p>
-        </div>
-      </section>
+      <PageHeader 
+        title="Our Portfolio" 
+        description="Browse our recent projects and see the quality of our craftsmanship."
+      />
 
       {/* Filter */}
       <section className="py-8 border-b border-slate-200 sticky top-16 bg-white/95 backdrop-blur z-40 shadow-sm">

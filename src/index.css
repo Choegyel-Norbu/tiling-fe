@@ -14,3 +14,18 @@
     @apply font-bold tracking-tight;
   }
 }
+
+@keyframes grid {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-grid {
+    animation: grid 15s linear infinite;
+  }
+}

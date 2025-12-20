@@ -1,18 +1,15 @@
 import React from 'react';
 import { Shield, Award, Users, CheckCircle } from 'lucide-react';
+import { PageHeader } from '../components/layout/PageHeader';
 
 export function About() {
   return (
     <div className="bg-white min-h-screen">
       {/* Hero */}
-      <section className="bg-primary text-white py-20 text-center">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">About TrueLine Tiling</h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-             Building trust through quality craftsmanship and reliable service since 2008.
-          </p>
-        </div>
-      </section>
+      <PageHeader 
+        title="About TrueLine Tiling" 
+        description="Building trust through quality craftsmanship and reliable service since 2008."
+      />
 
       {/* Story */}
       <section className="py-16">

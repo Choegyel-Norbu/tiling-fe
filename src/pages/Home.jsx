@@ -5,9 +5,11 @@ import { Button } from '../components/ui/Button';
 import { BentoGrid, BentoCard } from '../components/ui/bento-grid';
 import CaseStudies from '../components/ui/case-studies';
 import GalleryHoverCarousel from '../components/ui/gallery-hover-carousel';
+import { PixelTrail } from '../components/ui/pixel-trail';
+import { RetroGrid } from '../components/ui/retro-grid';
+import { useScreenSize } from '../hooks/use-screen-size';
 import { reviews } from '../data/reviews';
 import { projects } from '../data/projects';
-import tilingImage from '../assets/images/tiling.jpg';
 
 const features = [
   {
@@ -58,37 +60,33 @@ const features = [
 ];
 
 export function Home() {
+  const screenSize = useScreenSize();
+
   return (
     <div className="flex flex-col w-full">
       {/* Hero Section */}
-      <section className="relative h-[85vh] min-h-[600px] flex items-center overflow-hidden">
-        {/* Background Image */}
+      <section className="relative h-[85vh] min-h-[600px] flex items-center overflow-hidden bg-white">
+        {/* Retro Grid Background */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src={tilingImage} 
-            alt="Professional Tiling Work" 
-            className="w-full h-full object-cover"
-          />
-          {/* Professional Gradient Overlay - Improves text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-transparent"></div>
+          <RetroGrid angle={65} />
         </div>
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl">
             {/* Trust Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 border border-accent/30 text-accent font-semibold text-sm mb-8 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/30 text-accent font-semibold text-sm mb-8 backdrop-blur-sm">
               <Star className="w-4 h-4 fill-current" />
               <span>#1 Rated Tiling Specialists in Sydney</span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight tracking-tight">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight tracking-tight">
               Precision Tiling <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-yellow-200">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-yellow-600">
                 Masterfully Crafted
               </span>
             </h1>
             
-            <p className="text-lg md:text-xl text-slate-200 mb-10 leading-relaxed max-w-2xl font-light">
+            <p className="text-sm text-slate-600 mb-10 leading-relaxed max-w-2xl font-light">
               Transform your home with Australia's most trusted tiling experts. 
               From luxury bathroom renovations to durable outdoor paving, we deliver 
               flawless finishes guaranteed to last a lifetime.
@@ -96,38 +94,38 @@ export function Home() {
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/booking">
-                <Button size="lg" className="w-full sm:w-auto text-lg px-8 py-4 h-auto shadow-lg shadow-accent/20 transition-transform hover:scale-105">
+                <Button size="sm" className="w-full sm:w-auto shadow-lg shadow-accent/20 transition-transform hover:scale-105 bg-accent text-white hover:bg-yellow-600 cursor-pointer">
                   Book a Free Inspection
                 </Button>
               </Link>
               <Link to="/gallery">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto text-lg px-8 py-4 h-auto border-white/30 text-white hover:bg-white hover:text-slate-900 backdrop-blur-sm">
+                <Button variant="outline" size="sm" className="w-full sm:w-auto border-slate-300 text-slate-900 hover:bg-slate-100 hover:text-slate-900 cursor-pointer">
                   View Our Portfolio
                 </Button>
               </Link>
             </div>
             
             {/* Trust Indicators */}
-            <div className="mt-12 pt-8 border-t border-white/10 flex flex-wrap gap-8 text-sm font-medium text-slate-300">
+            <div className="mt-12 pt-8 border-t border-slate-200 flex flex-wrap gap-8 text-sm font-medium text-slate-700">
               <div className="flex items-center gap-3">
                 <Shield className="h-6 w-6 text-accent" />
                 <div>
-                  <span className="block text-white font-semibold">Fully Licensed</span>
-                  <span className="text-xs opacity-70">Lic No. 123456C</span>
+                  <span className="block text-slate-900 font-semibold">Fully Licensed</span>
+                  <span className="text-xs text-slate-500">Lic No. 123456C</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Award className="h-6 w-6 text-accent" />
                 <div>
-                  <span className="block text-white font-semibold">15+ Years</span>
-                  <span className="text-xs opacity-70">Experience</span>
+                  <span className="block text-slate-900 font-semibold">2+ Years</span>
+                  <span className="text-xs text-slate-500">Experience</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <CheckCircle className="h-6 w-6 text-accent" />
                 <div>
-                  <span className="block text-white font-semibold">7 Year Warranty</span>
-                  <span className="text-xs opacity-70">On All Workmanship</span>
+                  <span className="block text-slate-900 font-semibold">7 Year Warranty</span>
+                  <span className="text-xs text-slate-500">On All Workmanship</span>
                 </div>
               </div>
             </div>

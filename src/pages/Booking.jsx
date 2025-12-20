@@ -7,7 +7,7 @@ export function Booking() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-slate-900 mb-4">Book a Service</h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <p className="text-sm text-slate-600 max-w-2xl mx-auto">
             Schedule a free inspection or job booking in under 2 minutes. 
             Tell us what you need and we'll take care of the rest.
           </p>
