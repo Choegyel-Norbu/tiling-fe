@@ -7,6 +7,7 @@ import CaseStudies from '../components/ui/case-studies';
 import GalleryHoverCarousel from '../components/ui/gallery-hover-carousel';
 import { PixelTrail } from '../components/ui/pixel-trail';
 import { RetroGrid } from '../components/ui/retro-grid';
+import { StaggerTestimonials } from '../components/ui/stagger-testimonials';
 import { useScreenSize } from '../hooks/use-screen-size';
 import { reviews } from '../data/reviews';
 import { projects } from '../data/projects';
@@ -134,7 +135,7 @@ export function Home() {
       </section>
 
       {/* Services Section - Bento Grid */}
-      <section className="py-16 md:py-24 bg-slate-50">
+      <section className="py-16 md:py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Our Services</h2>
@@ -163,7 +164,7 @@ export function Home() {
       <CaseStudies />
 
       {/* Featured Projects */}
-      <GalleryHoverCarousel 
+      {/* <GalleryHoverCarousel 
         items={projects.map(p => ({
           id: p.id,
           title: p.title,
@@ -171,38 +172,16 @@ export function Home() {
           url: "/gallery",
           image: p.imageAfter
         }))}
-      />
+      /> */}
 
       {/* Reviews */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Client Feedback</h2>
-            <div className="flex justify-center items-center gap-2 text-yellow-500 mb-2">
-              <Star className="fill-current" />
-              <Star className="fill-current" />
-              <Star className="fill-current" />
-              <Star className="fill-current" />
-              <Star className="fill-current" />
-            </div>
             <p className="text-slate-600">5.0 Average rating based on Google Reviews</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {reviews.map((review) => (
-              <div key={review.id} className="bg-slate-50 p-6 rounded-lg border border-slate-100">
-                <div className="flex gap-1 text-yellow-500 mb-4">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-current" />
-                  ))}
-                </div>
-                <p className="text-slate-700 italic mb-6">"{review.text}"</p>
-                <div>
-                  <p className="font-bold text-slate-900">{review.name}</p>
-                  <p className="text-xs text-slate-500">{review.suburb} • {review.date}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <StaggerTestimonials />
         </div>
       </section>
 

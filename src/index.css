@@ -6,12 +6,63 @@
   --color-accent: #ca8a04;
 }
 
+/* Shadcn theme variables for component compatibility */
+:root {
+  --primary: 222 84% 5%; /* slate-900 */
+  --primary-foreground: 0 0% 100%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 84% 5%;
+  --background: 210 40% 98%; /* slate-50 */
+  --foreground: 222 84% 5%;
+  --muted: 210 40% 96%; /* slate-100 */
+  --muted-foreground: 215 16% 47%; /* slate-500 */
+  --border: 214 32% 91%; /* slate-200 */
+  --ring: 43 96% 56%; /* accent/yellow-500 */
+}
+
 @layer base {
   body {
     @apply antialiased text-gray-900 bg-white font-sans;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tight;
+  }
+}
+
+/* Shadcn utility classes for component compatibility */
+@layer utilities {
+  .bg-primary {
+    background-color: hsl(var(--primary));
+  }
+  .text-primary-foreground {
+    color: hsl(var(--primary-foreground));
+  }
+  .bg-card {
+    background-color: hsl(var(--card));
+  }
+  .text-card-foreground {
+    color: hsl(var(--card-foreground));
+  }
+  .bg-background {
+    background-color: hsl(var(--background));
+  }
+  .text-foreground {
+    color: hsl(var(--foreground));
+  }
+  .bg-muted {
+    background-color: hsl(var(--muted));
+  }
+  .text-muted-foreground {
+    color: hsl(var(--muted-foreground));
+  }
+  .border-border {
+    border-color: hsl(var(--border));
+  }
+  .ring-ring {
+    --tw-ring-color: hsl(var(--ring));
+  }
+  .border-primary {
+    border-color: hsl(var(--primary));
   }
 }
 
