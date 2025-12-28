@@ -155,13 +155,13 @@ export default function CaseStudies() {
         <div className="flex flex-col gap-4 text-center max-w-2xl mx-auto mb-20">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 font-medium text-sm mx-auto mb-4">
              <Shield className="w-4 h-4 text-accent" />
-             <span>The TrueLine Standard</span>
+             <span>The Himalayan Standard</span>
           </div>
           <h2
             id="case-studies-heading"
             className="text-2xl font-bold text-slate-900 tracking-tight"
           >
-            Why Homeowners <br/> Trust <span className="text-accent">TrueLine</span>
+            Why Homeowners <br/> Trust <span className="text-accent">Himalayan</span>
           </h2>
           <p className="text-slate-600 text-sm">
             We don't just lay tiles; we craft spaces. Our commitment to excellence ensures that every project receives the same level of precision and care.

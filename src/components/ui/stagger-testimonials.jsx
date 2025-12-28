@@ -8,7 +8,7 @@ const SQRT_5000 = Math.sqrt(5000);
 const testimonials = [
   {
     tempId: 0,
-    testimonial: "TrueLine transformed our outdated bathroom into a masterpiece. The team was professional, punctual, and the finish is flawless.",
+    testimonial: "Himalayan transformed our outdated bathroom into a masterpiece. The team was professional, punctual, and the finish is flawless.",
     by: "Sarah M., Bondi Junction",
     imgSrc: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face"
   },
@@ -44,13 +44,13 @@ const testimonials = [
   },
   {
     tempId: 6,
-    testimonial: "Took some convincing, but now that we're using TrueLine, we're never going back. Quality work every time.",
+    testimonial: "Took some convincing, but now that we're using Himalayan, we're never going back. Quality work every time.",
     by: "Lisa W., Paddington",
     imgSrc: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"
   },
   {
     tempId: 7,
-    testimonial: "The efficiency gains we've seen with TrueLine are off the charts! They completed our renovation ahead of schedule.",
+    testimonial: "The efficiency gains we've seen with Himalayan are off the charts! They completed our renovation ahead of schedule.",
     by: "James H., Chatswood",
     imgSrc: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face"
   },
@@ -62,13 +62,13 @@ const testimonials = [
   },
   {
     tempId: 9,
-    testimonial: "I switched to TrueLine 2 years ago and never looked back. Consistent quality and reliability.",
+    testimonial: "I switched to Himalayan 2 years ago and never looked back. Consistent quality and reliability.",
     by: "Peter S., Mosman",
     imgSrc: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=150&h=150&fit=crop&crop=face"
   },
   {
     tempId: 10,
-    testimonial: "I've been searching for a solution like TrueLine for YEARS. So glad I finally found one!",
+    testimonial: "I've been searching for a solution like Himalayan for YEARS. So glad I finally found one!",
     by: "Amanda C., Double Bay",
     imgSrc: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=face"
   },
@@ -80,49 +80,49 @@ const testimonials = [
   },
   {
     tempId: 12,
-    testimonial: "TrueLine's customer support is unparalleled. They're always there when we need them.",
+    testimonial: "Himalayan's customer support is unparalleled. They're always there when we need them.",
     by: "Sophie K., Balmain",
     imgSrc: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face"
   },
   {
     tempId: 13,
-    testimonial: "The efficiency gains we've seen since implementing TrueLine are off the charts!",
+    testimonial: "The efficiency gains we've seen since implementing Himalayan are off the charts!",
     by: "Tom R., Newtown",
     imgSrc: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=150&h=150&fit=crop&crop=face"
   },
   {
     tempId: 14,
-    testimonial: "TrueLine has revolutionized how we handle our renovation projects. It's a game-changer!",
+    testimonial: "Himalayan has revolutionized how we handle our renovation projects. It's a game-changer!",
     by: "Emma D., Glebe",
     imgSrc: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=150&h=150&fit=crop&crop=face"
   },
   {
     tempId: 15,
-    testimonial: "The scalability of TrueLine's solution is impressive. It grows with our business seamlessly.",
+    testimonial: "The scalability of Himalayan's solution is impressive. It grows with our business seamlessly.",
     by: "Chris B., Leichhardt",
     imgSrc: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&h=150&fit=crop&crop=face"
   },
   {
     tempId: 16,
-    testimonial: "I appreciate how TrueLine continually innovates. They're always one step ahead.",
+    testimonial: "I appreciate how Himalayan continually innovates. They're always one step ahead.",
     by: "Nicole F., Camperdown",
     imgSrc: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face"
   },
   {
     tempId: 17,
-    testimonial: "The ROI we've seen with TrueLine is incredible. It's paid for itself many times over.",
+    testimonial: "The ROI we've seen with Himalayan is incredible. It's paid for itself many times over.",
     by: "Mark J., Annandale",
     imgSrc: "https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=150&h=150&fit=crop&crop=face"
   },
   {
     tempId: 18,
-    testimonial: "TrueLine's platform is so robust, yet easy to use. It's the perfect balance of quality and service.",
+    testimonial: "Himalayan's platform is so robust, yet easy to use. It's the perfect balance of quality and service.",
     by: "Rachel T., Marrickville",
     imgSrc: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=150&h=150&fit=crop&crop=face"
   },
   {
     tempId: 19,
-    testimonial: "We've tried many solutions, but TrueLine stands out in terms of reliability and performance.",
+    testimonial: "We've tried many solutions, but Himalayan stands out in terms of reliability and performance.",
     by: "Alex N., Enmore",
     imgSrc: "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=150&h=150&fit=crop&crop=face"
   }

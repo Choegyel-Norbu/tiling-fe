@@ -5,11 +5,7 @@ import { PageHeader } from '../components/layout/PageHeader';
 export function About() {
   return (
     <div className="bg-white min-h-screen">
-      {/* Hero */}
-      <PageHeader 
-        title="About TrueLine Tiling" 
-        description="Building trust through quality craftsmanship and reliable service since 2008."
-      />
+     
 
       {/* Story */}
       <section className="py-16">
@@ -26,7 +22,7 @@ export function About() {
               <h2 className="text-3xl font-bold text-slate-900 mb-6">Our Story</h2>
               <div className="space-y-4 text-slate-600 leading-relaxed">
                 <p>
-                  TrueLine Tiling began with a simple mission: to provide Australian homeowners with tiling services they could actually rely on. 
+                  Himalayan Tiling began with a simple mission: to provide Australian homeowners with tiling services they could actually rely on. 
                   Founded by master tiler John Smith, we grew from a one-man operation to a dedicated team of certified professionals.
                 </p>
                 <p>

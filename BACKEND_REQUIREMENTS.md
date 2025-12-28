@@ -1,7 +1,7 @@
-# Backend Development Requirements for TrueLine Tiling
+# Backend Development Requirements for Himalayan Tiling
 
 ## Overview
-This document provides comprehensive backend requirements to support the TrueLine Tiling frontend application, with special focus on the booking system.
+This document provides comprehensive backend requirements to support the Himalayan Tiling frontend application, with special focus on the booking system.
 
 ---
 
@@ -284,7 +284,7 @@ Returns list of blocked dates.
 
 **Booking Confirmation Email (to Customer):**
 - **Trigger**: When booking is created
-- **Subject**: "Booking Confirmed - TrueLine Tiling"
+- **Subject**: "Booking Confirmed - Himalayan Tiling"
 - **Content**:
   - Booking reference number
   - Service details
@@ -309,7 +309,7 @@ Returns list of blocked dates.
 
 **Booking Confirmation SMS:**
 - **Trigger**: When booking is created
-- **Content**: "Hi {name}, your booking TR-{ref} is confirmed. We'll contact you within 24hrs. TrueLine Tiling"
+- **Content**: "Hi {name}, your booking TR-{ref} is confirmed. We'll contact you within 24hrs. Himalayan Tiling"
 
 **Reminder SMS:**
 - **Trigger**: 24 hours before scheduled appointment

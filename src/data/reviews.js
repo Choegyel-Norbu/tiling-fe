@@ -4,7 +4,7 @@ export const reviews = [
     name: "Sarah M.",
     suburb: "Bondi Junction",
     rating: 5,
-    text: "TrueLine transformed our outdated bathroom into a masterpiece. The team was professional, punctual, and the finish is flawless.",
+    text: "Himalayan transformed our outdated bathroom into a masterpiece. The team was professional, punctual, and the finish is flawless.",
     date: "2 months ago"
   },
   {

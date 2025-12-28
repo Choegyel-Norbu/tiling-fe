@@ -14,7 +14,7 @@ export function Footer() {
               <div className="bg-accent p-1 rounded-md">
                 <Hammer className="h-5 w-5 text-white" />
               </div>
-              <span className="font-bold text-xl text-white tracking-tight">TrueLine Tiling</span>
+              <span className="font-bold text-xl text-white tracking-tight">Himalayan Tiling</span>
             </div>
             <p className="text-sm leading-relaxed mb-4">
               Professional tiling and household services across Australia. Quality craftsmanship, guaranteed.
@@ -63,7 +63,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-accent shrink-0" />
-                <a href="mailto:info@truelinetiling.com.au" className="hover:text-accent">info@truelinetiling.com.au</a>
+                <a href="mailto:info@himalayantiling.com.au" className="hover:text-accent">info@himalayantiling.com.au</a>
               </li>
             </ul>
             <div className="mt-6 pt-6 border-t border-slate-700 text-xs text-slate-500">
@@ -73,7 +73,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-12 pt-8 border-t border-slate-800 text-center text-sm text-slate-500">
-          <p>&copy; {new Date().getFullYear()} TrueLine Tiling. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Himalayan Tiling. All rights reserved.</p>
         </div>
       </div>
     </footer>

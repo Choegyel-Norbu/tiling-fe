@@ -2,17 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Check, Clock, Hammer, ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { PageHeader } from '../components/layout/PageHeader';
 import { services } from '../data/services';
 
 export function Services() {
   return (
     <div className="flex flex-col w-full">
-      {/* Hero */}
-      <PageHeader 
-        title="Our Expert Services" 
-        description="We provide a comprehensive range of tiling and household services, delivering quality results for every project size."
-      />
+      
 
       {/* Services List */}
       <section className="py-16 bg-slate-50">

@@ -11,7 +11,7 @@ export function PageHeader({ title, description, className, children }) {
        <div className="container mx-auto px-4 text-center max-w-4xl">
          <div className="inline-flex items-center rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-sm text-accent mb-4">
             <span className="flex h-2 w-2 rounded-full bg-accent mr-2"></span>
-            TrueLine Tiling
+            Himalayan Tiling
          </div>
 
          <h1 className="text-xl font-bold text-slate-900 mb-3 tracking-tight leading-tight">
