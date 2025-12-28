@@ -207,7 +207,7 @@ export default function CaseStudies() {
                   ].join(" ")}
                 >
                   <div>
-                    <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                    <h3 className="text-xl md:text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
                       {study.title}
                     </h3>
                     <blockquote className="text-sm text-slate-600 leading-relaxed border-l-4 border-accent pl-4 py-2 bg-slate-50/50">

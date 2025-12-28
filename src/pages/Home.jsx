@@ -139,7 +139,7 @@ export function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Our Services</h2>
-            <p className="text-slate-600 text-lg">
+            <p className="text-slate-600 text-sm">
               From minor repairs to full renovations, we deliver quality that stands the test of time.
             </p>
           </div>
@@ -188,8 +188,8 @@ export function Home() {
       {/* CTA */}
       <section className="py-20 bg-primary text-white text-center">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">Ready to transform your space?</h2>
-          <p className="text-lg text-slate-300 mb-8 max-w-2xl mx-auto">
+          <h2 className="text-xl font-bold mb-6">Ready to transform your space?</h2>
+          <p className="text-sm text-slate-300 mb-8 max-w-2xl mx-auto">
             Book a free inspection or get a quote online in under 2 minutes. No obligation.
           </p>
           <Link to="/booking">

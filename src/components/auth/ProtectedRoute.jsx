@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 import { Dialog } from '../ui/Dialog';
-import { Shield, AlertCircle } from 'lucide-react';
+import { AlertCircle, User } from 'lucide-react';
 
 export function ProtectedRoute({ children }) {
   const { isAuthenticated, login, isLoading } = useAuth();
@@ -64,41 +64,51 @@ export function ProtectedRoute({ children }) {
       <Dialog
         isOpen={!isAuthenticated}
         onClose={handleClose}
-        title="Sign In Required"
+        title=""
         showCloseButton={true}
+        maxWidth="sm"
       >
-        <div className="text-center">
-          <div className="mb-6">
-            <Shield className="h-16 w-16 text-accent mx-auto mb-4" />
-            <p className="text-slate-600 mb-6">
-              Please sign in with your Google account to book a service.
+        <div className="text-center px-4 pb-4">
+          <div className="mb-8">
+            <div className="flex justify-center mb-6">
+              <div className="bg-accent p-3 rounded-full shadow-lg shadow-accent/20">
+                <User className="h-8 w-8 text-white" />
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">Sign in to Continue</h3>
+            <p className="text-slate-500 text-sm leading-relaxed max-w-xs mx-auto">
+              Please sign in with your Google account to manage your bookings and access our services.
             </p>
           </div>
 
           {loginError && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
-              <AlertCircle className="h-4 w-4 shrink-0" />
+            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 text-red-700 text-sm text-left">
+              <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
               <span>{loginError}</span>
             </div>
           )}
 
           {isLoggingIn && (
-            <div className="mb-4 flex items-center justify-center gap-2 text-slate-600 text-sm">
+            <div className="mb-6 flex items-center justify-center gap-2 text-slate-600 text-sm">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-accent"></div>
-              <span>Signing in...</span>
+              <span>Signing you in...</span>
             </div>
           )}
 
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-6">
             <GoogleLogin
               onSuccess={handleLoginSuccess}
               onError={handleLoginError}
               disabled={isLoggingIn}
+              theme="filled_blue"
+              shape="pill"
+              text="continue_with"
+              logo_alignment="left"
             />
           </div>
 
-          <p className="text-xs text-slate-500 mt-4">
-            We use Google Sign-In to keep your information secure and make booking easier.
+          <p className="text-[10px] text-slate-400">
+            By signing in, you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>
       </Dialog>
