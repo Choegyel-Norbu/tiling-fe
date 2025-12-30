@@ -3,6 +3,7 @@ import { Loader2, AlertCircle, Calendar } from 'lucide-react';
 import { PageHeader } from '../components/layout/PageHeader';
 import { BookingCard } from '../components/booking/BookingCard';
 import { UpdateBookingDialog } from '../components/booking/UpdateBookingDialog';
+import { RatingDialog } from '../components/booking/RatingDialog';
 import { bookingAPI } from '../services/api';
 
 export function MyBookings() {
@@ -13,6 +14,7 @@ export function MyBookings() {
   // State for interactions
   const [expandedId, setExpandedId] = useState(null);
   const [editingBooking, setEditingBooking] = useState(null);
+  const [ratingBooking, setRatingBooking] = useState(null);
 
   const fetchBookings = async () => {
     try {
@@ -106,6 +108,7 @@ export function MyBookings() {
               isExpanded={expandedId === booking.id}
               onToggle={() => handleToggle(booking.id)}
               onEdit={setEditingBooking}
+              onRate={setRatingBooking}
             />
           ))}
         </div>
@@ -117,6 +120,14 @@ export function MyBookings() {
         isOpen={!!editingBooking}
         onClose={() => setEditingBooking(null)}
         onUpdateSuccess={fetchBookings}
+      />
+
+      {/* Rating Dialog */}
+      <RatingDialog
+        booking={ratingBooking}
+        isOpen={!!ratingBooking}
+        onClose={() => setRatingBooking(null)}
+        onRatingSuccess={fetchBookings}
       />
     </div>
   );

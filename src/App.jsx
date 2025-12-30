@@ -40,14 +40,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />
-          <Route 
-            path="/booking" 
-            element={
-              <ProtectedRoute>
-                <Booking />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/booking" element={<Booking />} />
           <Route 
             path="/my-bookings" 
             element={

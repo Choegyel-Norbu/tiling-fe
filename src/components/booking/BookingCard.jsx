@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Calendar, MapPin, Phone, Clock, FileText, ChevronDown, 
   ExternalLink, Edit2, CheckCircle, XCircle, Hourglass, 
-  Image as ImageIcon 
+  Image as ImageIcon, Star
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cn } from '../../utils/cn';
@@ -124,14 +124,35 @@ function formatFileSize(bytes) {
 
 // --- Main Component ---
 
-export function BookingCard({ booking, isExpanded, onToggle, onEdit }) {
+export function BookingCard({ booking, isExpanded, onToggle, onEdit, onRate }) {
+  const cardRef = useRef(null);
   const service = services.find(s => s.id === booking.serviceId);
   const formattedDate = new Date(booking.preferredDate).toLocaleDateString('en-AU', {
     weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
   });
+  
+  // Check if booking has a rating
+  const hasRating = booking.rating && booking.rating > 0;
+
+  // Scroll into view when card is expanded
+  useEffect(() => {
+    if (isExpanded && cardRef.current) {
+      // Small delay to allow animation to start
+      const timeoutId = setTimeout(() => {
+        cardRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest'
+        });
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isExpanded]);
 
   return (
     <motion.div 
+      ref={cardRef}
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -173,7 +194,7 @@ export function BookingCard({ booking, isExpanded, onToggle, onEdit }) {
           </div>
           
           <div className="flex items-center gap-2 pl-16 md:pl-0">
-             {onEdit && booking.status?.toLowerCase() !== 'cancelled' && booking.status?.toLowerCase() !== 'confirmed' && (
+             {onEdit && booking.status?.toLowerCase() !== 'cancelled' && booking.status?.toLowerCase() !== 'confirmed' && booking.status?.toLowerCase() !== 'completed' && (
                <Button
                  variant="ghost" 
                  size="sm"
@@ -240,6 +261,68 @@ export function BookingCard({ booking, isExpanded, onToggle, onEdit }) {
                       <p className="text-sm text-slate-700 bg-white p-4 rounded-lg border border-slate-200 leading-relaxed">
                         {booking.description}
                       </p>
+                    </div>
+                  )}
+
+                  {/* Rating Section */}
+                  {onRate && booking.status?.toLowerCase() === 'completed' && (
+                    <div>
+                      <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Your Rating</h4>
+                      {hasRating ? (
+                        <div className="bg-white p-4 rounded-lg border border-slate-200">
+                          <div className="flex items-center gap-2 mb-2">
+                            {[...Array(10)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={cn(
+                                  "h-4 w-4",
+                                  i < booking.rating
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "fill-slate-200 text-slate-300"
+                                )}
+                              />
+                            ))}
+                            <span className="text-sm font-semibold text-slate-900 ml-1">
+                              {booking.rating}/10
+                            </span>
+                          </div>
+                          {booking.ratingComment && (
+                            <p className="text-sm text-slate-700 italic mt-2">
+                              "{booking.ratingComment}"
+                            </p>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="mt-3 text-slate-600 hover:text-accent hover:bg-accent/5"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRate(booking);
+                            }}
+                          >
+                            <Star className="h-4 w-4 mr-2 fill-current text-yellow-500" />
+                            Update Rating
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="bg-white p-4 rounded-lg border border-slate-200">
+                          <p className="text-sm text-slate-600 mb-3">
+                            Share your experience with us
+                          </p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-slate-700 hover:text-accent hover:border-accent"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRate(booking);
+                            }}
+                          >
+                            <Star className="h-4 w-4 mr-2" />
+                            Rate
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

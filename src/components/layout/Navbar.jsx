@@ -1,23 +1,33 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Phone, Hammer, ChevronDown, LogOut, User, Calendar, Shield } from 'lucide-react';
+import { Menu, X, Phone, Hammer, ChevronDown, LogOut, User, Calendar, Shield, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../ui/Button';
+import { Dialog } from '../ui/Dialog';
 import { cn } from '../../utils/cn';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, isAdmin, isUser } = useAuth();
+  const { showToast } = useToast();
 
   const handleLogout = () => {
-    logout();
+    setShowLogoutDialog(true);
     setIsUserMenuOpen(false);
+  };
+
+  const confirmLogout = () => {
+    logout();
+    setShowLogoutDialog(false);
     setIsOpen(false);
+    showToast('You have been successfully signed out', 'success', 3000);
     navigate('/');
   };
 
@@ -188,8 +198,7 @@ export function Navbar() {
                             onClick={() => setIsUserMenuOpen(false)}
                             className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors cursor-pointer"
                           >
-                            <Shield className="h-4 w-4" />
-                            <span>Admin Panel</span>
+                            <span>Admin Dashboard</span>
                           </Link>
                         )}
                         <button
@@ -347,8 +356,7 @@ export function Navbar() {
                       onClick={() => setIsOpen(false)}
                       className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors mb-1 cursor-pointer"
                     >
-                      <Shield className="h-4 w-4" />
-                      <span>Admin Panel</span>
+                      <span>Admin Dashboard</span>
                     </Link>
                   )}
                   <button
@@ -367,6 +375,42 @@ export function Navbar() {
           </div>
         </div>
       )}
+
+      {/* Sign Out Confirmation Dialog */}
+      <Dialog
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+        maxWidth="sm"
+        position="top"
+      >
+        <div className="text-center py-6 px-4">
+          {/* Title and Message */}
+          <h2 className="text-2xl font-bold text-slate-900 mb-3">
+            Sign Out?
+          </h2>
+          <p className="text-slate-600 mb-8 text-sm leading-relaxed">
+            Are you sure you want to sign out? You'll need to sign in again to access your bookings.
+          </p>
+
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutDialog(false)}
+              className="flex-1 sm:flex-none sm:px-6"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmLogout}
+              className="flex-1 sm:flex-none sm:px-6 bg-red-600 text-white hover:bg-red-700"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </nav>
   );
 }

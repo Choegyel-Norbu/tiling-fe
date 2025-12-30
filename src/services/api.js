@@ -6,6 +6,28 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api';
 
 /**
+ * Custom event name for unauthorized responses
+ * AuthContext listens for this event to trigger proper logout
+ */
+export const AUTH_LOGOUT_EVENT = 'auth:logout';
+
+/**
+ * Dispatches the logout event when a 401 is received
+ * This allows React components (AuthContext) to respond to unauthorized API calls
+ */
+function dispatchLogoutEvent() {
+  window.dispatchEvent(new CustomEvent(AUTH_LOGOUT_EVENT));
+}
+
+/**
+ * Handles 401 responses - clears storage and dispatches logout event
+ */
+function handleUnauthorized() {
+  authStorage.clear();
+  dispatchLogoutEvent();
+}
+
+/**
  * Generic API request helper
  */
 async function apiRequest(endpoint, options = {}) {
@@ -30,11 +52,10 @@ async function apiRequest(endpoint, options = {}) {
 
     // Handle non-200 status codes
     if (!response.ok) {
-      // Handle Unauthorized (401) or Forbidden (403)
-      if (response.status === 401 || response.status === 403) {
-        authStorage.clear();
-        window.location.href = '/'; // Redirect to home/login
-        return;
+      // Handle Unauthorized (401)
+      if (response.status === 401) {
+        handleUnauthorized();
+        throw new Error('Session expired. Please sign in again.');
       }
       throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
     }
@@ -84,14 +105,14 @@ export const bookingAPI = {
    */
   async createBooking(formData) {
     const token = authStorage.getToken();
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api';
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api';
 
     if (!token) {
       throw new Error('Authentication required');
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/bookings`, {
+      const response = await fetch(`${baseUrl}/bookings`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -108,9 +129,10 @@ export const bookingAPI = {
           const errorMessages = Object.values(data.error.details).join(', ');
           throw new Error(errorMessages || data.error?.message || 'Validation failed');
         }
-        // Handle unauthorized
+        // Handle unauthorized - dispatch logout event
         if (response.status === 401) {
-          throw new Error('Authentication required. Please log in again.');
+          handleUnauthorized();
+          throw new Error('Session expired. Please sign in again.');
         }
         throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
       }
@@ -141,14 +163,57 @@ export const bookingAPI = {
   /**
    * Update a booking
    * @param {string} bookingId - Booking ID to update
-   * @param {Object} updateData - Fields to update (date, timeSlot, description, suburb, postcode, jobSize, phone)
+   * @param {Object|FormData} updateData - Fields to update (date, timeSlot, description, suburb, postcode, jobSize, phone) or FormData with files
+   * @param {boolean} isFormData - Whether updateData is FormData (for file uploads)
    * @returns {Promise} API response with updated booking data
    */
-  async updateBooking(bookingId, updateData) {
-    return apiRequest(`/bookings/${bookingId}`, {
-      method: 'PUT',
-      body: JSON.stringify(updateData),
-    });
+  async updateBooking(bookingId, updateData, isFormData = false) {
+    const token = authStorage.getToken();
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api';
+
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const config = {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      };
+
+      if (isFormData) {
+        // For FormData, don't set Content-Type - browser will set it with boundary
+        config.body = updateData;
+      } else {
+        // For JSON
+        config.headers['Content-Type'] = 'application/json';
+        config.body = JSON.stringify(updateData);
+      }
+
+      const response = await fetch(`${baseUrl}/bookings/${bookingId}`, config);
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle validation errors
+        if (response.status === 400 && data.error?.details) {
+          const errorMessages = Object.values(data.error.details).join(', ');
+          throw new Error(errorMessages || data.error?.message || 'Validation failed');
+        }
+        // Handle unauthorized
+        if (response.status === 401) {
+          handleUnauthorized();
+          throw new Error('Session expired. Please sign in again.');
+        }
+        throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Booking update failed:', error);
+      throw error;
+    }
   },
 
   /**
@@ -177,6 +242,102 @@ export const bookingAPI = {
     return apiRequest('/bookings/block-dates', {
       method: 'GET',
     });
+  },
+};
+
+/**
+ * File Upload API
+ * Handles file deletion operations
+ */
+export const fileAPI = {
+  /**
+   * Delete a single file by file key
+   * @param {string} fileKey - The file key (filename) to delete
+   * @returns {Promise} API response
+   */
+  async deleteFile(fileKey) {
+    const token = authStorage.getToken();
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api';
+
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const response = await fetch(`${baseUrl}/v1/uploadthing/files/${fileKey}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+          handleUnauthorized();
+          throw new Error('Session expired. Please sign in again.');
+        }
+        throw new Error(data.error?.message || `Failed to delete file. Status: ${response.status}`);
+      }
+
+      // Some APIs return empty body on success
+      if (response.status === 204 || response.headers.get('content-length') === '0') {
+        return { success: true };
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('File deletion failed:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete multiple files by file keys
+   * @param {string[]} fileKeys - Array of file keys (filenames) to delete
+   * @returns {Promise} API response
+   */
+  async deleteFiles(fileKeys) {
+    const token = authStorage.getToken();
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api';
+
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    if (!Array.isArray(fileKeys) || fileKeys.length === 0) {
+      throw new Error('File keys array is required and cannot be empty');
+    }
+
+    try {
+      const response = await fetch(`${baseUrl}/v1/uploadthing/files`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(fileKeys),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+          handleUnauthorized();
+          throw new Error('Session expired. Please sign in again.');
+        }
+        throw new Error(data.error?.message || `Failed to delete files. Status: ${response.status}`);
+      }
+
+      // Some APIs return empty body on success
+      if (response.status === 204 || response.headers.get('content-length') === '0') {
+        return { success: true };
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Multiple file deletion failed:', error);
+      throw error;
+    }
   },
 };
 
@@ -212,6 +373,56 @@ export const authStorage = {
   clear() {
     this.removeToken();
     this.removeUser();
+  },
+};
+
+/**
+ * Rating API
+ */
+export const ratingAPI = {
+  /**
+   * Submit a rating for a booking
+   * @param {string} bookingId - Booking ID to rate
+   * @param {number} rating - Rating value (1-10)
+   * @param {string} comment - Optional comment
+   * @returns {Promise} API response
+   */
+  async submitRating(bookingId, rating, comment = '') {
+    return apiRequest(`/ratings/bookings/${bookingId}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        rating,
+        comment: comment.trim() || undefined,
+      }),
+    });
+  },
+};
+
+/**
+ * Notifications API
+ */
+export const notificationsAPI = {
+  /**
+   * Get notifications (Admin only)
+   * @param {number} page - Page number (0-indexed)
+   * @param {number} limit - Number of items per page
+   * @returns {Promise} API response with paginated notifications
+   */
+  async getNotifications(page = 0, limit = 20) {
+    return apiRequest(`/notifications?page=${page}&limit=${limit}`, {
+      method: 'GET',
+    });
+  },
+
+  /**
+   * Mark a notification as read
+   * @param {string|number} notificationId - Notification ID to mark as read
+   * @returns {Promise} API response
+   */
+  async markAsRead(notificationId) {
+    return apiRequest(`/notifications/${notificationId}/read`, {
+      method: 'PATCH',
+    });
   },
 };
 

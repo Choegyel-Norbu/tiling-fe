@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../utils/cn';
 
-export function Dialog({ isOpen, onClose, title, children, showCloseButton = true, maxWidth = 'md' }) {
+export function Dialog({ isOpen, onClose, title, children, showCloseButton = true, maxWidth = 'md', position = 'center' }) {
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -30,7 +30,12 @@ export function Dialog({ isOpen, onClose, title, children, showCloseButton = tru
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className={cn(
+          "fixed inset-0 z-[100] flex p-4",
+          position === 'top' && "items-start justify-center pt-8 sm:pt-12",
+          position === 'center' && "items-center justify-center",
+          position === 'bottom' && "items-end justify-center pb-8 sm:pb-12"
+        )}>
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -43,9 +48,9 @@ export function Dialog({ isOpen, onClose, title, children, showCloseButton = tru
 
           {/* Dialog */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            initial={{ opacity: 0, scale: 0.95, y: position === 'top' ? -10 : position === 'bottom' ? 10 : 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            exit={{ opacity: 0, scale: 0.95, y: position === 'top' ? -10 : position === 'bottom' ? 10 : 10 }}
             transition={{ duration: 0.2 }}
             className={cn(
               "relative bg-white rounded-lg shadow-xl w-full max-h-[90vh] overflow-y-auto z-10",

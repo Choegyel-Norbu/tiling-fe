@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Check, ChevronRight, ChevronLeft, Calendar, Upload, MapPin, User, FileText, X as XIcon, AlertCircle } from 'lucide-react';
+import { Check, ChevronRight, ChevronLeft, Calendar, Upload, MapPin, User as UserIcon, FileText, X as XIcon, AlertCircle } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { services } from '../../data/services';
 import { cn } from '../../utils/cn';
@@ -149,9 +149,9 @@ export function BookingForm({ onSubmitted }) {
   };
 
   const onSubmit = async (data) => {
-    // Check authentication
+    // Safety check - user should already be authenticated at this point
     if (!isAuthenticated) {
-      setSubmitError('Please log in to create a booking.');
+      setSubmitError('Please sign in to create a booking.');
       return;
     }
 
@@ -459,7 +459,7 @@ export function BookingForm({ onSubmitted }) {
               <div className="md:col-span-2">
                 <label className="block text-base font-semibold text-slate-900 mb-3">Full Name</label>
                 <div className="relative">
-                  <User className="absolute left-4 top-3.5 h-6 w-6 text-slate-400" />
+                  <UserIcon className="absolute left-4 top-3.5 h-6 w-6 text-slate-400" />
                   <input
                     type="text"
                     {...register('name', { required: 'Name is required' })}

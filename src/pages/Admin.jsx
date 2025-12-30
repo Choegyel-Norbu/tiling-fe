@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, List, Settings, Search, Bell, User, CheckCircle, XCircle, Clock, AlertCircle, LogOut, Loader2, Phone, Mail, MapPin, Menu, X, Ban, Home, Eye, Image as ImageIcon, FileText, ExternalLink } from 'lucide-react';
+import { Calendar as CalendarIcon, List, Settings, Search, Bell, User, CheckCircle, XCircle, Clock, AlertCircle, LogOut, Loader2, Phone, Mail, MapPin, Menu, X, Ban, Home, Eye, Image as ImageIcon, FileText, ExternalLink, MoreVertical, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../utils/cn';
 import { useAuth } from '../context/AuthContext';
-import { bookingAPI } from '../services/api';
+import { bookingAPI, notificationsAPI } from '../services/api';
 import { services } from '../data/services';
 import { Dialog } from '../components/ui/Dialog';
 import { CalendarView } from '../components/admin/CalendarView';
@@ -18,6 +18,17 @@ export function Admin() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  
+  // Notifications state
+  const [notifications, setNotifications] = useState([]);
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
+  const [notificationsError, setNotificationsError] = useState(null);
+  const [notificationsPage, setNotificationsPage] = useState(0);
+  const [notificationsTotalPages, setNotificationsTotalPages] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [expandedNotificationId, setExpandedNotificationId] = useState(null);
+  
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -25,8 +36,17 @@ export function Admin() {
   useEffect(() => {
     if (activeTab === 'bookings') {
       fetchBookings();
+    } else if (activeTab === 'notifications') {
+      fetchNotifications(0);
     }
   }, [activeTab]);
+
+  // Fetch notifications on mount to get unread count (only if not already on notifications tab)
+  useEffect(() => {
+    if (activeTab !== 'notifications') {
+      fetchNotifications(0);
+    }
+  }, []);
 
   const fetchBookings = async () => {
     try {
@@ -43,6 +63,85 @@ export function Admin() {
       setError(err.message || 'Failed to load bookings');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchNotifications = async (page = 0) => {
+    try {
+      setIsLoadingNotifications(true);
+      setNotificationsError(null);
+      const response = await notificationsAPI.getNotifications(page, 20);
+      if (response.success && response.data) {
+        setNotifications(response.data.content || []);
+        setNotificationsPage(response.data.page || 0);
+        setNotificationsTotalPages(response.data.totalPages || 0);
+        // Count unread notifications from current page
+        // Note: This only counts unread from the current page
+        // For a full count, you'd need to fetch all pages or have a separate endpoint
+        const unread = (response.data.content || []).filter(n => !n.isRead).length;
+        // Only update unread count if we're on the first page or if it's higher
+        if (page === 0 || unread > 0) {
+          setUnreadCount(prev => page === 0 ? unread : Math.max(prev, unread));
+        }
+      } else {
+        throw new Error(response.error?.message || 'Failed to fetch notifications');
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      setNotificationsError(err.message || 'Failed to load notifications');
+    } finally {
+      setIsLoadingNotifications(false);
+    }
+  };
+
+  const handleMarkAsRead = async (notificationId) => {
+    // Optimistically update the UI
+    const notification = notifications.find(n => n.id === notificationId);
+    if (!notification || notification.isRead) {
+      return; // Already read, no need to update
+    }
+
+    // Update local state immediately for better UX
+    setNotifications(prevNotifications =>
+      prevNotifications.map(n =>
+        n.id === notificationId ? { ...n, isRead: true } : n
+      )
+    );
+    
+    // Update unread count
+    setUnreadCount(prev => Math.max(0, prev - 1));
+
+    try {
+      const response = await notificationsAPI.markAsRead(notificationId);
+      if (!response.success) {
+        // Revert on error
+        setNotifications(prevNotifications =>
+          prevNotifications.map(n =>
+            n.id === notificationId ? { ...n, isRead: false } : n
+          )
+        );
+        setUnreadCount(prev => prev + 1);
+        throw new Error(response.error?.message || 'Failed to mark notification as read');
+      }
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+      // Error is already handled by reverting the optimistic update
+    }
+  };
+
+  const handleToggleNotification = (notificationId) => {
+    const isCurrentlyExpanded = expandedNotificationId === notificationId;
+    
+    if (isCurrentlyExpanded) {
+      // Collapse
+      setExpandedNotificationId(null);
+    } else {
+      // Expand - mark as read when expanding
+      setExpandedNotificationId(notificationId);
+      const notification = notifications.find(n => n.id === notificationId);
+      if (notification && !notification.isRead) {
+        handleMarkAsRead(notificationId);
+      }
     }
   };
 
@@ -67,6 +166,7 @@ export function Admin() {
       alert(err.message || 'Failed to confirm booking. Please try again.');
     } finally {
       setUpdatingStatus(null);
+      setOpenDropdownId(null);
     }
   };
 
@@ -95,6 +195,36 @@ export function Admin() {
       alert(err.message || 'Failed to reject booking. Please try again.');
     } finally {
       setUpdatingStatus(null);
+      setOpenDropdownId(null);
+    }
+  };
+
+  const handleCompleteBooking = async (bookingId) => {
+    if (!window.confirm('Mark this booking as completed?')) {
+      return;
+    }
+
+    try {
+      setUpdatingStatus(bookingId);
+      const response = await bookingAPI.updateBookingStatus(bookingId, 'completed');
+      if (response.success) {
+        // Update the booking in the local state
+        setBookings(prevBookings =>
+          prevBookings.map(booking =>
+            booking.id === bookingId
+              ? { ...booking, status: 'completed' }
+              : booking
+          )
+        );
+      } else {
+        throw new Error(response.error?.message || 'Failed to complete booking');
+      }
+    } catch (err) {
+      console.error('Error completing booking:', err);
+      alert(err.message || 'Failed to complete booking. Please try again.');
+    } finally {
+      setUpdatingStatus(null);
+      setOpenDropdownId(null);
     }
   };
 
@@ -157,7 +287,22 @@ export function Admin() {
   const handleViewDetails = (booking) => {
     setSelectedBooking(booking);
     setIsDetailsOpen(true);
+    setOpenDropdownId(null);
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (openDropdownId && !event.target.closest('.dropdown-container')) {
+        setOpenDropdownId(null);
+      }
+    };
+
+    if (openDropdownId) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [openDropdownId]);
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -224,6 +369,21 @@ export function Admin() {
           >
             <CalendarIcon className="h-5 w-5" />
             Calendar
+          </button>
+          <button 
+            onClick={() => handleTabChange('notifications')}
+            className={cn(
+              "flex items-center gap-3 w-full px-4 py-3 rounded-lg transition-colors text-sm relative",
+              activeTab === 'notifications' ? "bg-accent text-white" : "hover:bg-slate-800"
+            )}
+          >
+            <Bell className="h-5 w-5" />
+            Notifications
+            {unreadCount > 0 && (
+              <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
           </button>
           <button 
             onClick={() => handleTabChange('settings')}
@@ -307,6 +467,21 @@ export function Admin() {
             Calendar
           </button>
           <button 
+            onClick={() => handleTabChange('notifications')}
+            className={cn(
+              "flex items-center gap-3 w-full px-4 py-3 rounded-lg transition-colors text-sm relative",
+              activeTab === 'notifications' ? "bg-accent text-white" : "hover:bg-slate-800"
+            )}
+          >
+            <Bell className="h-5 w-5" />
+            Notifications
+            {unreadCount > 0 && (
+              <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </button>
+          <button 
             onClick={() => handleTabChange('settings')}
             className={cn(
               "flex items-center gap-3 w-full px-4 py-3 rounded-lg transition-colors text-sm",
@@ -371,9 +546,16 @@ export function Admin() {
                  />
                </div>
              )}
-             <button className="p-2 text-slate-400 hover:text-slate-600 relative">
+             <button 
+               onClick={() => handleTabChange('notifications')}
+               className="p-2 text-slate-400 hover:text-slate-600 relative"
+             >
                <Bell className="h-5 w-5" />
-               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+               {unreadCount > 0 && (
+                 <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                   {unreadCount > 9 ? '9+' : unreadCount}
+                 </span>
+               )}
              </button>
            </div>
         </header>
@@ -517,52 +699,66 @@ export function Admin() {
                                 </span>
                               </td>
                               <td className="px-6 py-4">
-                                <div className="flex items-center gap-2 justify-end">
-                                  <button
-                                    onClick={() => handleViewDetails(booking)}
-                                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium text-sm transition-colors bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                  >
-                                    <Eye className="h-4 w-4" />
-                                    <span className="hidden lg:inline">Details</span>
-                                  </button>
-                                  {booking.status?.toLowerCase() === 'pending' && (
-                                    <>
-                                      <button
-                                        onClick={() => handleConfirmBooking(booking.id)}
-                                        disabled={updatingStatus === booking.id}
-                                        className={cn(
-                                          "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium text-sm transition-colors",
-                                          updatingStatus === booking.id
-                                            ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                            : "bg-green-600 text-white hover:bg-green-700"
+                                <div className="flex items-center justify-end">
+                                  <div className="relative dropdown-container">
+                                    <button
+                                      onClick={() => setOpenDropdownId(openDropdownId === booking.id ? null : booking.id)}
+                                      disabled={updatingStatus === booking.id}
+                                      className={cn(
+                                        "p-2 rounded-lg transition-colors",
+                                        updatingStatus === booking.id
+                                          ? "text-slate-400 cursor-not-allowed"
+                                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                                      )}
+                                    >
+                                      {updatingStatus === booking.id ? (
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                      ) : (
+                                        <MoreVertical className="h-5 w-5" />
+                                      )}
+                                    </button>
+                                    {openDropdownId === booking.id && (
+                                      <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-50 py-1">
+                                        <button
+                                          onClick={() => handleViewDetails(booking)}
+                                          className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                        >
+                                          <Eye className="h-4 w-4" />
+                                          View Details
+                                        </button>
+                                        {booking.status?.toLowerCase() === 'pending' && (
+                                          <>
+                                            <button
+                                              onClick={() => handleConfirmBooking(booking.id)}
+                                              disabled={updatingStatus === booking.id}
+                                              className="w-full px-4 py-2 text-left text-sm text-green-700 hover:bg-green-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                              <CheckCircle className="h-4 w-4" />
+                                              Confirm
+                                            </button>
+                                            <button
+                                              onClick={() => handleRejectBooking(booking.id)}
+                                              disabled={updatingStatus === booking.id}
+                                              className="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                              <Ban className="h-4 w-4" />
+                                              Cancel
+                                            </button>
+                                          </>
                                         )}
-                                      >
-                                        {updatingStatus === booking.id ? (
-                                          <Loader2 className="h-4 w-4 animate-spin" />
-                                        ) : (
-                                          <CheckCircle className="h-4 w-4" />
+                                        {booking.status?.toLowerCase() === 'confirmed' && (
+                                          <button
+                                            onClick={() => handleCompleteBooking(booking.id)}
+                                            disabled={updatingStatus === booking.id}
+                                            className="w-full px-4 py-2 text-left text-sm text-blue-700 hover:bg-blue-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                          >
+                                            <CheckCircle className="h-4 w-4" />
+                                            Complete
+                                          </button>
                                         )}
-                                        <span className="hidden lg:inline">Confirm</span>
-                                      </button>
-                                      <button
-                                        onClick={() => handleRejectBooking(booking.id)}
-                                        disabled={updatingStatus === booking.id}
-                                        className={cn(
-                                          "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium text-sm transition-colors",
-                                          updatingStatus === booking.id
-                                            ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                            : "bg-red-600 text-white hover:bg-red-700"
-                                        )}
-                                      >
-                                        {updatingStatus === booking.id ? (
-                                          <Loader2 className="h-4 w-4 animate-spin" />
-                                        ) : (
-                                          <Ban className="h-4 w-4" />
-                                        )}
-                                        <span className="hidden lg:inline">Reject</span>
-                                      </button>
-                                    </>
-                                  )}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </td>
                             </tr>
@@ -582,6 +778,66 @@ export function Admin() {
                             <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
                               {booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1) || 'N/A'}
                             </span>
+                          </div>
+                          {/* Action Menu - Top Right */}
+                          <div className="relative dropdown-container">
+                            <button
+                              onClick={() => setOpenDropdownId(openDropdownId === booking.id ? null : booking.id)}
+                              disabled={updatingStatus === booking.id}
+                              className={cn(
+                                "p-2 rounded-lg transition-colors",
+                                updatingStatus === booking.id
+                                  ? "text-slate-400 cursor-not-allowed"
+                                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                              )}
+                            >
+                              {updatingStatus === booking.id ? (
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                              ) : (
+                                <MoreVertical className="h-5 w-5" />
+                              )}
+                            </button>
+                            {openDropdownId === booking.id && (
+                              <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-50 py-1">
+                                <button
+                                  onClick={() => handleViewDetails(booking)}
+                                  className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                  View Details
+                                </button>
+                                {booking.status?.toLowerCase() === 'pending' && (
+                                  <>
+                                    <button
+                                      onClick={() => handleConfirmBooking(booking.id)}
+                                      disabled={updatingStatus === booking.id}
+                                      className="w-full px-4 py-2 text-left text-sm text-green-700 hover:bg-green-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                      <CheckCircle className="h-4 w-4" />
+                                      Confirm
+                                    </button>
+                                    <button
+                                      onClick={() => handleRejectBooking(booking.id)}
+                                      disabled={updatingStatus === booking.id}
+                                      className="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                      <Ban className="h-4 w-4" />
+                                      Cancel
+                                    </button>
+                                  </>
+                                )}
+                                {booking.status?.toLowerCase() === 'confirmed' && (
+                                  <button
+                                    onClick={() => handleCompleteBooking(booking.id)}
+                                    disabled={updatingStatus === booking.id}
+                                    className="w-full px-4 py-2 text-left text-sm text-blue-700 hover:bg-blue-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    <CheckCircle className="h-4 w-4" />
+                                    Complete
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                         
@@ -666,65 +922,6 @@ export function Admin() {
                               </div>
                             </div>
                           )}
-
-                          {/* Action Buttons */}
-                          <div className="flex gap-2 mt-3">
-                            <button
-                              onClick={() => handleViewDetails(booking)}
-                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors bg-slate-100 text-slate-700 hover:bg-slate-200"
-                            >
-                              <Eye className="h-4 w-4" />
-                              <span>View Details</span>
-                            </button>
-                            {booking.status?.toLowerCase() === 'pending' && (
-                              <>
-                                <button
-                                  onClick={() => handleConfirmBooking(booking.id)}
-                                  disabled={updatingStatus === booking.id}
-                                  className={cn(
-                                    "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors",
-                                    updatingStatus === booking.id
-                                      ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                      : "bg-green-600 text-white hover:bg-green-700"
-                                  )}
-                                >
-                                  {updatingStatus === booking.id ? (
-                                    <>
-                                      <Loader2 className="h-4 w-4 animate-spin" />
-                                      <span>Processing...</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <CheckCircle className="h-4 w-4" />
-                                      <span>Confirm</span>
-                                    </>
-                                  )}
-                                </button>
-                                <button
-                                  onClick={() => handleRejectBooking(booking.id)}
-                                  disabled={updatingStatus === booking.id}
-                                  className={cn(
-                                    "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors",
-                                    updatingStatus === booking.id
-                                      ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                      : "bg-red-600 text-white hover:bg-red-700"
-                                  )}
-                                >
-                                  {updatingStatus === booking.id ? (
-                                    <>
-                                      <Loader2 className="h-4 w-4 animate-spin" />
-                                      <span>Processing...</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Ban className="h-4 w-4" />
-                                      <span>Reject</span>
-                                    </>
-                                  )}
-                                </button>
-                              </>
-                            )}
-                          </div>
                         </div>
                       </div>
                     ))}
@@ -736,6 +933,185 @@ export function Admin() {
 
           {activeTab === 'calendar' && (
             <CalendarView />
+          )}
+
+          {activeTab === 'notifications' && (
+            <>
+              {isLoadingNotifications ? (
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 flex flex-col items-center justify-center">
+                  <Loader2 className="h-8 w-8 text-accent animate-spin mb-4" />
+                  <p className="text-slate-600 font-medium">Loading notifications...</p>
+                </div>
+              ) : notificationsError ? (
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+                  <div className="flex items-center gap-3 text-red-600 mb-4">
+                    <AlertCircle className="h-5 w-5" />
+                    <p className="font-medium">{notificationsError}</p>
+                  </div>
+                  <button
+                    onClick={() => fetchNotifications(0)}
+                    className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              ) : notifications.length === 0 ? (
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
+                  <Bell className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-600 font-medium">No notifications found.</p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-slate-200">
+                    <h3 className="text-lg font-bold text-slate-900">Notifications</h3>
+                    <p className="text-sm text-slate-500 mt-1">
+                      {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {notifications.map((notification) => {
+                      const isExpanded = expandedNotificationId === notification.id;
+                      return (
+                        <div
+                          key={notification.id}
+                          className={cn(
+                            "transition-colors",
+                            !notification.isRead && "bg-blue-50/50"
+                          )}
+                        >
+                          {/* Collapsed Header - Always Visible */}
+                          <div
+                            onClick={() => handleToggleNotification(notification.id)}
+                            className={cn(
+                              "p-4 md:p-6 hover:bg-slate-50 cursor-pointer transition-colors",
+                              isExpanded && "bg-slate-50"
+                            )}
+                          >
+                            <div className="flex items-start gap-4">
+                              <div className={cn(
+                                "w-2 h-2 rounded-full mt-2 flex-shrink-0",
+                                !notification.isRead ? "bg-blue-500" : "bg-slate-300"
+                              )} />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between gap-4">
+                                  <p className={cn(
+                                    "text-sm md:text-base font-medium",
+                                    !notification.isRead ? "text-slate-900" : "text-slate-700"
+                                  )}>
+                                    {notification.message}
+                                  </p>
+                                  <div className="flex items-center gap-3 flex-shrink-0">
+                                    <span className="text-xs text-slate-500">
+                                      {new Date(notification.createdAt).toLocaleDateString('en-AU', {
+                                        day: 'numeric',
+                                        month: 'short',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                      })}
+                                    </span>
+                                    <ChevronDown
+                                      className={cn(
+                                        "h-4 w-4 text-slate-400 transition-transform",
+                                        isExpanded && "rotate-180"
+                                      )}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Expanded Details - Only shown when expanded */}
+                          {isExpanded && (
+                            <div className="px-4 md:px-6 pb-4 md:pb-6 pt-0 border-t border-slate-100">
+                              <div className="ml-6 space-y-3">
+                                {notification.booking && (
+                                  <div className="mt-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                    <div className="flex flex-wrap items-center gap-4 text-sm">
+                                      <div>
+                                        <span className="text-slate-500">Booking:</span>
+                                        <span className="ml-2 font-mono font-semibold text-slate-900">
+                                          {notification.booking.bookingRef}
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <span className="text-slate-500">Service:</span>
+                                        <span className="ml-2 text-slate-900">
+                                          {getServiceName(notification.booking.serviceId)}
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <span className="text-slate-500">Date:</span>
+                                        <span className="ml-2 text-slate-900">
+                                          {formatDate(notification.booking.preferredDate)}
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <span className="text-slate-500">Status:</span>
+                                        <span className={cn(
+                                          "ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border",
+                                          getStatusColor(notification.booking.status)
+                                        )}>
+                                          {notification.booking.status?.charAt(0).toUpperCase() + notification.booking.status?.slice(1) || 'N/A'}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                                {notification.user && (
+                                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                                    {notification.user.picture && (
+                                      <img
+                                        src={notification.user.picture}
+                                        alt={notification.user.name || 'User'}
+                                        className="w-5 h-5 rounded-full"
+                                      />
+                                    )}
+                                    <span>{notification.user.name || notification.user.email}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {notificationsTotalPages > 1 && (
+                    <div className="p-4 md:p-6 border-t border-slate-200 flex items-center justify-between">
+                      <button
+                        onClick={() => fetchNotifications(notificationsPage - 1)}
+                        disabled={notificationsPage === 0}
+                        className={cn(
+                          "px-4 py-2 rounded-lg font-medium transition-colors",
+                          notificationsPage === 0
+                            ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                            : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                        )}
+                      >
+                        Previous
+                      </button>
+                      <span className="text-sm text-slate-600">
+                        Page {notificationsPage + 1} of {notificationsTotalPages}
+                      </span>
+                      <button
+                        onClick={() => fetchNotifications(notificationsPage + 1)}
+                        disabled={notificationsPage >= notificationsTotalPages - 1}
+                        className={cn(
+                          "px-4 py-2 rounded-lg font-medium transition-colors",
+                          notificationsPage >= notificationsTotalPages - 1
+                            ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                            : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                        )}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
 
           {activeTab === 'settings' && (

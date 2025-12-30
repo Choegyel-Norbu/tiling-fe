@@ -1,11 +1,31 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI, authStorage } from '../services/api';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { authAPI, authStorage, AUTH_LOGOUT_EVENT } from '../services/api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  /**
+   * Handle logout - called when user clicks logout or when API returns 401
+   */
+  const handleLogout = useCallback(() => {
+    setUser(null);
+    authStorage.clear();
+  }, []);
+
+  // Listen for 401 logout events from API service
+  useEffect(() => {
+    const onLogoutEvent = () => {
+      handleLogout();
+    };
+
+    window.addEventListener(AUTH_LOGOUT_EVENT, onLogoutEvent);
+    return () => {
+      window.removeEventListener(AUTH_LOGOUT_EVENT, onLogoutEvent);
+    };
+  }, [handleLogout]);
 
   // Check for existing session on mount
   useEffect(() => {
@@ -67,11 +87,9 @@ export function AuthProvider({ children }) {
 
   /**
    * Logout - clear all authentication data
+   * Uses the shared handleLogout callback
    */
-  const logout = () => {
-    setUser(null);
-    authStorage.clear();
-  };
+  const logout = handleLogout;
 
   // Computed role checks
   const isAdmin = user?.role === 'ADMIN';
