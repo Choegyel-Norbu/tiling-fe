@@ -6,21 +6,21 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api';
 
 /**
- * Custom event name for unauthorized responses
+ * Custom event name for unauthorized/forbidden responses
  * AuthContext listens for this event to trigger proper logout
  */
 export const AUTH_LOGOUT_EVENT = 'auth:logout';
 
 /**
- * Dispatches the logout event when a 401 is received
- * This allows React components (AuthContext) to respond to unauthorized API calls
+ * Dispatches the logout event when a 401 or 403 is received
+ * This allows React components (AuthContext) to respond to unauthorized/forbidden API calls
  */
 function dispatchLogoutEvent() {
   window.dispatchEvent(new CustomEvent(AUTH_LOGOUT_EVENT));
 }
 
 /**
- * Handles 401 responses - clears storage and dispatches logout event
+ * Handles 401 (Unauthorized) and 403 (Forbidden) responses - clears storage and dispatches logout event
  */
 function handleUnauthorized() {
   authStorage.clear();
@@ -52,10 +52,10 @@ async function apiRequest(endpoint, options = {}) {
 
     // Handle non-200 status codes
     if (!response.ok) {
-      // Handle Unauthorized (401)
-      if (response.status === 401) {
+      // Handle Unauthorized (401) or Forbidden (403)
+      if (response.status === 401 || response.status === 403) {
         handleUnauthorized();
-        throw new Error('Session expired. Please sign in again.');
+        throw new Error(response.status === 403 ? 'Access forbidden. Please sign in again.' : 'Session expired. Please sign in again.');
       }
       throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
     }
@@ -129,10 +129,10 @@ export const bookingAPI = {
           const errorMessages = Object.values(data.error.details).join(', ');
           throw new Error(errorMessages || data.error?.message || 'Validation failed');
         }
-        // Handle unauthorized - dispatch logout event
-        if (response.status === 401) {
+        // Handle unauthorized (401) or forbidden (403) - dispatch logout event
+        if (response.status === 401 || response.status === 403) {
           handleUnauthorized();
-          throw new Error('Session expired. Please sign in again.');
+          throw new Error(response.status === 403 ? 'Access forbidden. Please sign in again.' : 'Session expired. Please sign in again.');
         }
         throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
       }
@@ -273,9 +273,9 @@ export const fileAPI = {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        if (response.status === 401) {
+        if (response.status === 401 || response.status === 403) {
           handleUnauthorized();
-          throw new Error('Session expired. Please sign in again.');
+          throw new Error(response.status === 403 ? 'Access forbidden. Please sign in again.' : 'Session expired. Please sign in again.');
         }
         throw new Error(data.error?.message || `Failed to delete file. Status: ${response.status}`);
       }
@@ -321,9 +321,9 @@ export const fileAPI = {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        if (response.status === 401) {
+        if (response.status === 401 || response.status === 403) {
           handleUnauthorized();
-          throw new Error('Session expired. Please sign in again.');
+          throw new Error(response.status === 403 ? 'Access forbidden. Please sign in again.' : 'Session expired. Please sign in again.');
         }
         throw new Error(data.error?.message || `Failed to delete files. Status: ${response.status}`);
       }

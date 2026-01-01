@@ -26,7 +26,7 @@ export function BookingForm({ onSubmitted }) {
   const [submitError, setSubmitError] = useState(null);
   const { user, isAuthenticated } = useAuth();
 
-  const { register, handleSubmit, watch, setValue, control, formState: { errors, isValid } } = useForm({
+  const { register, handleSubmit, watch, setValue, control, trigger, formState: { errors, isValid } } = useForm({
     mode: 'onChange',
     defaultValues: {
       serviceId: searchParams.get('service') || '',
@@ -132,7 +132,25 @@ export function BookingForm({ onSubmitted }) {
 
 
   // Helper to move to next step
-  const nextStep = () => {
+  const nextStep = async () => {
+    const fieldsToValidate = {
+      0: ['serviceId'], // Step 1: Service
+      1: ['suburb', 'postcode'], // Step 2: Job Details
+      2: ['date', 'timeSlot'], // Step 3: Schedule
+      3: ['name', 'email', 'phone'] // Step 4: Contact
+    };
+
+    const fields = fieldsToValidate[currentStep] || [];
+    
+    // Trigger validation for current step fields
+    const isValid = await trigger(fields);
+    
+    if (!isValid) {
+      setSubmitError('Please complete all required fields correctly before continuing.');
+      window.scrollTo(0, 0);
+      return;
+    }
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(prev => prev + 1);
       setSubmitError(null); // Clear errors when navigating
@@ -284,7 +302,9 @@ export function BookingForm({ onSubmitted }) {
           <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-lg p-4 flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-red-800 font-semibold mb-1">Booking Failed</p>
+              {submitError !== 'Please complete all required fields correctly before continuing.' && (
+                <p className="text-red-800 font-semibold mb-1">Booking Failed</p>
+              )}
               <p className="text-red-600 text-sm">{submitError}</p>
             </div>
           </div>
@@ -370,7 +390,12 @@ export function BookingForm({ onSubmitted }) {
                   <MapPin className="absolute left-4 top-3.5 h-6 w-6 text-slate-400" />
                   <input
                     type="text"
-                    {...register('suburb', { required: 'Suburb is required' })}
+                    {...register('suburb', { 
+                      required: 'Suburb is required',
+                      minLength: { value: 2, message: 'Suburb must be at least 2 characters' },
+                      maxLength: { value: 100, message: 'Suburb must be less than 100 characters' },
+                      pattern: { value: /^[a-zA-Z\s'-]+$/, message: 'Suburb can only contain letters, spaces, hyphens, and apostrophes' }
+                    })}
                     className="pl-12 w-full h-12 rounded-lg border-2 border-slate-300 shadow-sm focus:border-accent focus:ring-2 focus:ring-accent/20 text-base"
                     placeholder="e.g. Richmond"
                   />
@@ -382,9 +407,16 @@ export function BookingForm({ onSubmitted }) {
                 <input
                   type="text"
                   {...register('postcode', { 
-                    required: 'Required',
-                    pattern: { value: /^[0-9]{4}$/, message: '4 digits' }
+                    required: 'Postcode is required',
+                    pattern: { value: /^[0-9]{4}$/, message: 'Postcode must be exactly 4 digits' },
+                    validate: {
+                      validRange: (value) => {
+                        const num = parseInt(value, 10);
+                        return (num >= 200 && num <= 9999) || 'Postcode must be between 0200 and 9999';
+                      }
+                    }
                   })}
+                  maxLength={4}
                   className="w-full h-12 rounded-lg border-2 border-slate-300 shadow-sm focus:border-accent focus:ring-2 focus:ring-accent/20 text-base px-4"
                   placeholder="0000"
                 />
@@ -394,13 +426,20 @@ export function BookingForm({ onSubmitted }) {
 
             {/* Description */}
             <div>
-              <label className="block text-base font-semibold text-slate-900 mb-3">Additional Details</label>
+              <label className="block text-base font-semibold text-slate-900 mb-3">Additional Details <span className="text-slate-400 font-normal text-sm">(Optional)</span></label>
               <textarea
-                {...register('description')}
+                {...register('description', {
+                  maxLength: { value: 1000, message: 'Description must be less than 1000 characters' }
+                })}
                 rows={6}
+                maxLength={1000}
                 className="w-full rounded-lg border-2 border-slate-300 shadow-sm focus:border-accent focus:ring-2 focus:ring-accent/20 text-base p-4"
                 placeholder="Describe the job... (e.g. 'Tiles are already purchased', 'Need old tiles removed')"
               />
+              {errors.description && <p className="text-red-500 text-sm mt-2">{errors.description.message}</p>}
+              <p className="text-xs text-slate-500 mt-1">
+                {watch('description')?.length || 0} / 1000 characters
+              </p>
             </div>
           </div>
         )}
@@ -417,8 +456,26 @@ export function BookingForm({ onSubmitted }) {
                   <Calendar className="absolute left-4 top-3.5 h-6 w-6 text-slate-400" />
                   <input
                     type="date"
-                    {...register('date', { required: 'Please select a date' })}
+                    {...register('date', { 
+                      required: 'Please select a date',
+                      validate: {
+                        futureDate: (value) => {
+                          const selectedDate = new Date(value);
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          selectedDate.setHours(0, 0, 0, 0);
+                          return selectedDate >= today || 'Date must be today or in the future';
+                        },
+                        notTooFar: (value) => {
+                          const selectedDate = new Date(value);
+                          const maxDate = new Date();
+                          maxDate.setFullYear(maxDate.getFullYear() + 1);
+                          return selectedDate <= maxDate || 'Date cannot be more than 1 year in the future';
+                        }
+                      }
+                    })}
                     min={new Date().toISOString().split('T')[0]}
+                    max={new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]}
                     className="pl-12 w-full h-12 rounded-lg border-2 border-slate-300 shadow-sm focus:border-accent focus:ring-2 focus:ring-accent/20 text-base"
                   />
                 </div>
@@ -462,7 +519,12 @@ export function BookingForm({ onSubmitted }) {
                   <UserIcon className="absolute left-4 top-3.5 h-6 w-6 text-slate-400" />
                   <input
                     type="text"
-                    {...register('name', { required: 'Name is required' })}
+                    {...register('name', { 
+                      required: 'Name is required',
+                      minLength: { value: 2, message: 'Name must be at least 2 characters' },
+                      maxLength: { value: 100, message: 'Name must be less than 100 characters' },
+                      pattern: { value: /^[a-zA-Z\s'-]+$/, message: 'Name can only contain letters, spaces, hyphens, and apostrophes' }
+                    })}
                     className="pl-12 w-full h-12 rounded-lg border-2 border-slate-300 shadow-sm focus:border-accent focus:ring-2 focus:ring-accent/20 text-base"
                     placeholder="John Doe"
                   />
@@ -476,7 +538,11 @@ export function BookingForm({ onSubmitted }) {
                   type="email"
                   {...register('email', { 
                     required: 'Email is required',
-                    pattern: { value: /^\S+@\S+$/i, message: 'Invalid email' }
+                    pattern: { 
+                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i, 
+                      message: 'Please enter a valid email address' 
+                    },
+                    maxLength: { value: 255, message: 'Email must be less than 255 characters' }
                   })}
                   className="w-full h-12 rounded-lg border-2 border-slate-300 shadow-sm focus:border-accent focus:ring-2 focus:ring-accent/20 text-base px-4"
                   placeholder="john@example.com"
