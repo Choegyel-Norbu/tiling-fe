@@ -243,6 +243,17 @@ export const bookingAPI = {
       method: 'GET',
     });
   },
+
+  /**
+   * Delete a booking by ID (Admin only)
+   * @param {string|number} bookingId - Booking ID to delete
+   * @returns {Promise} API response
+   */
+  async deleteBooking(bookingId) {
+    return apiRequest(`/bookings/${bookingId}`, {
+      method: 'DELETE',
+    });
+  },
 };
 
 /**

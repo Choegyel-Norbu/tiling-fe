@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, List, Settings, Search, Bell, User, CheckCircle, XCircle, Clock, AlertCircle, LogOut, Loader2, Phone, Mail, MapPin, Menu, X, Ban, Home, Eye, Image as ImageIcon, FileText, ExternalLink, MoreVertical, ChevronDown } from 'lucide-react';
+import { Calendar as CalendarIcon, List, Settings, Search, Bell, User, CheckCircle, XCircle, Clock, AlertCircle, LogOut, Loader2, Phone, Mail, MapPin, Menu, X, Ban, Home, Eye, Image as ImageIcon, FileText, ExternalLink, MoreVertical, ChevronDown, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../utils/cn';
 import { useAuth } from '../context/AuthContext';
@@ -222,6 +222,34 @@ export function Admin() {
     } catch (err) {
       console.error('Error completing booking:', err);
       alert(err.message || 'Failed to complete booking. Please try again.');
+    } finally {
+      setUpdatingStatus(null);
+      setOpenDropdownId(null);
+    }
+  };
+
+  const handleDeleteBooking = async (bookingId) => {
+    const booking = bookings.find(b => b.id === bookingId);
+    const bookingRef = booking?.bookingRef || bookingId;
+    
+    if (!window.confirm(`Are you sure you want to delete booking ${bookingRef}? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setUpdatingStatus(bookingId);
+      const response = await bookingAPI.deleteBooking(bookingId);
+      if (response.success) {
+        // Remove the booking from the local state
+        setBookings(prevBookings =>
+          prevBookings.filter(booking => booking.id !== bookingId)
+        );
+      } else {
+        throw new Error(response.error?.message || 'Failed to delete booking');
+      }
+    } catch (err) {
+      console.error('Error deleting booking:', err);
+      alert(err.message || 'Failed to delete booking. Please try again.');
     } finally {
       setUpdatingStatus(null);
       setOpenDropdownId(null);
@@ -744,6 +772,14 @@ export function Admin() {
                                               <Ban className="h-4 w-4" />
                                               Cancel
                                             </button>
+                                            <button
+                                              onClick={() => handleDeleteBooking(booking.id)}
+                                              disabled={updatingStatus === booking.id}
+                                              className="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed border-t border-slate-200 mt-1 pt-2"
+                                            >
+                                              <Trash2 className="h-4 w-4" />
+                                              Delete
+                                            </button>
                                           </>
                                         )}
                                         {booking.status?.toLowerCase() === 'confirmed' && (
@@ -823,6 +859,14 @@ export function Admin() {
                                     >
                                       <Ban className="h-4 w-4" />
                                       Cancel
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteBooking(booking.id)}
+                                      disabled={updatingStatus === booking.id}
+                                      className="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed border-t border-slate-200 mt-1 pt-2"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                      Delete
                                     </button>
                                   </>
                                 )}
