@@ -52,7 +52,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <nav className="bg-slate-900 md:bg-white border-b border-slate-800 md:border-slate-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 min-h-[64px]">
           <div className="flex items-center">
@@ -60,8 +60,8 @@ export function Navbar() {
               <div className="bg-accent p-1.5 rounded-md">
                 <Hammer className="h-6 w-6 text-white" />
               </div>
-              <span className="font-bold text-xl text-primary tracking-tight hidden sm:inline">Himalayan Tiling</span>
-              <span className="font-bold text-lg text-primary tracking-tight sm:hidden">HT</span>
+              <span className="font-bold text-xl text-white md:text-primary tracking-tight hidden sm:inline">Himalayan Tiling</span>
+              <span className="font-bold text-lg text-white md:text-primary tracking-tight sm:hidden">HT</span>
             </Link>
           </div>
 
@@ -221,7 +221,7 @@ export function Navbar() {
           <div className="flex items-center md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent cursor-pointer"
+              className="inline-flex items-center justify-center p-2 rounded-md text-slate-400 md:text-slate-400 hover:text-slate-500 md:hover:text-slate-500 hover:bg-slate-100 md:hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent cursor-pointer"
             >
               <span className="sr-only">Open main menu</span>
               {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
@@ -232,16 +232,16 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden">
-          <div className="pt-2 pb-3 space-y-1 px-4 sm:px-6">
+        <div className="md:hidden bg-slate-900 border-t border-slate-800">
+          <div className="pt-2 pb-3 space-y-1 px-4 sm:px-6 bg-slate-900">
             <Link
               to="/"
               onClick={() => setIsOpen(false)}
               className={cn(
                 "block px-3 py-2 rounded-md text-base font-medium cursor-pointer",
                 isActive('/')
-                  ? "bg-accent/10 text-accent"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-accent/20 text-accent"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
               )}
             >
               Home
@@ -254,8 +254,8 @@ export function Navbar() {
                 className={cn(
                   "w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium cursor-pointer",
                   isActive('/services')
-                    ? "bg-accent/10 text-accent"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-accent/20 text-accent"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
                 )}
               >
                 <span>Services</span>
@@ -283,7 +283,7 @@ export function Navbar() {
                             setIsOpen(false);
                             setIsServicesOpen(false);
                           }}
-                          className="block px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-none cursor-pointer"
+                          className="block px-3 py-2 rounded-md text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-none cursor-pointer"
                         >
                           {service.name}
                         </Link>
@@ -302,15 +302,15 @@ export function Navbar() {
                 className={cn(
                   "block px-3 py-2 rounded-md text-base font-medium cursor-pointer",
                   isActive(link.path)
-                    ? "bg-accent/10 text-accent"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-accent/20 text-accent"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
                 )}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="pt-4 border-t border-slate-200 mt-4">
-              <a href="tel:+61400000000" className="flex items-center gap-2 text-slate-600 px-3 py-2 cursor-pointer">
+            <div className="pt-4 border-t border-slate-800 mt-4">
+              <a href="tel:+61400000000" className="flex items-center gap-2 text-slate-300 px-3 py-2 cursor-pointer">
                 <Phone className="h-5 w-5" />
                 <span className="font-medium">0400 000 000</span>
               </a>
@@ -322,29 +322,29 @@ export function Navbar() {
               
               {/* User Menu - Mobile */}
               {isAuthenticated && user && (
-                <div className="mt-4 border-t border-slate-200 pt-4 px-3">
+                <div className="mt-4 border-t border-slate-800 pt-4 px-3">
                   <div className="flex items-center gap-3 px-3 py-2 mb-2">
                     {user.picture ? (
                       <img 
                         src={user.picture} 
                         alt={user.name || 'User'} 
-                        className="h-10 w-10 rounded-full border-2 border-slate-200"
+                        className="h-10 w-10 rounded-full border-2 border-slate-700"
                       />
                     ) : (
-                      <div className="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
+                      <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
                         <User className="h-5 w-5 text-accent" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-900 truncate">{user.name || 'User'}</p>
-                      <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                      <p className="text-sm font-semibold text-white truncate">{user.name || 'User'}</p>
+                      <p className="text-xs text-slate-400 truncate">{user.email}</p>
                     </div>
                   </div>
                   {isUser && (
                     <Link
                       to="/my-bookings"
                       onClick={() => setIsOpen(false)}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors mb-1 cursor-pointer"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 rounded-md transition-colors mb-1 cursor-pointer"
                     >
                       <Calendar className="h-4 w-4" />
                       <span>My Bookings</span>
@@ -354,7 +354,7 @@ export function Navbar() {
                     <Link
                       to="/admin"
                       onClick={() => setIsOpen(false)}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors mb-1 cursor-pointer"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 rounded-md transition-colors mb-1 cursor-pointer"
                     >
                       <span>Admin Dashboard</span>
                     </Link>
@@ -364,7 +364,7 @@ export function Navbar() {
                       handleLogout();
                       setIsOpen(false);
                     }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors cursor-pointer"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-900/30 rounded-md transition-colors cursor-pointer"
                   >
                     <LogOut className="h-4 w-4" />
                     <span>Sign Out</span>

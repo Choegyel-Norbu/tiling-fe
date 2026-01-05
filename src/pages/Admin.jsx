@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, List, Settings, Search, Bell, User, CheckCircle, XCircle, Clock, AlertCircle, LogOut, Loader2, Phone, Mail, MapPin, Menu, X, Ban, Home, Eye, Image as ImageIcon, FileText, ExternalLink, MoreVertical, ChevronDown, Trash2 } from 'lucide-react';
+import { Calendar as CalendarIcon, List, Settings, Search, Bell, User, CheckCircle, XCircle, Clock, AlertCircle, LogOut, Loader2, Phone, Mail, MapPin, Menu, X, Ban, Home, Eye, Image as ImageIcon, FileText, ExternalLink, MoreVertical, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../utils/cn';
 import { useAuth } from '../context/AuthContext';
@@ -19,6 +19,16 @@ export function Admin() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState(null);
+  
+  // Confirmation dialog state
+  const [confirmationDialog, setConfirmationDialog] = useState({
+    isOpen: false,
+    action: null, // 'confirm', 'complete', 'reject'
+    bookingId: null,
+    bookingRef: null,
+    message: '',
+    onConfirm: null
+  });
   
   // Notifications state
   const [notifications, setNotifications] = useState([]);
@@ -146,114 +156,111 @@ export function Admin() {
   };
 
   const handleConfirmBooking = async (bookingId) => {
-    try {
-      setUpdatingStatus(bookingId);
-      const response = await bookingAPI.updateBookingStatus(bookingId, 'confirmed');
-      if (response.success) {
-        // Update the booking in the local state
-        setBookings(prevBookings =>
-          prevBookings.map(booking =>
-            booking.id === bookingId
-              ? { ...booking, status: 'confirmed' }
-              : booking
-          )
-        );
-      } else {
-        throw new Error(response.error?.message || 'Failed to confirm booking');
+    const booking = bookings.find(b => b.id === bookingId);
+    setConfirmationDialog({
+      isOpen: true,
+      action: 'confirm',
+      bookingId,
+      bookingRef: booking?.bookingRef || 'N/A',
+      message: 'Are you sure you want to confirm this booking?',
+      onConfirm: async () => {
+        try {
+          setUpdatingStatus(bookingId);
+          const response = await bookingAPI.updateBookingStatus(bookingId, 'confirmed');
+          if (response.success) {
+            // Update the booking in the local state
+            setBookings(prevBookings =>
+              prevBookings.map(booking =>
+                booking.id === bookingId
+                  ? { ...booking, status: 'confirmed' }
+                  : booking
+              )
+            );
+            setConfirmationDialog({ isOpen: false, action: null, bookingId: null, bookingRef: null, message: '', onConfirm: null });
+          } else {
+            throw new Error(response.error?.message || 'Failed to confirm booking');
+          }
+        } catch (err) {
+          console.error('Error confirming booking:', err);
+          alert(err.message || 'Failed to confirm booking. Please try again.');
+        } finally {
+          setUpdatingStatus(null);
+          setOpenDropdownId(null);
+        }
       }
-    } catch (err) {
-      console.error('Error confirming booking:', err);
-      alert(err.message || 'Failed to confirm booking. Please try again.');
-    } finally {
-      setUpdatingStatus(null);
-      setOpenDropdownId(null);
-    }
+    });
   };
 
   const handleRejectBooking = async (bookingId) => {
-    if (!window.confirm('Are you sure you want to reject this booking? This action cannot be undone.')) {
-      return;
-    }
-
-    try {
-      setUpdatingStatus(bookingId);
-      const response = await bookingAPI.updateBookingStatus(bookingId, 'cancelled');
-      if (response.success) {
-        // Update the booking in the local state
-        setBookings(prevBookings =>
-          prevBookings.map(booking =>
-            booking.id === bookingId
-              ? { ...booking, status: 'cancelled' }
-              : booking
-          )
-        );
-      } else {
-        throw new Error(response.error?.message || 'Failed to reject booking');
+    const booking = bookings.find(b => b.id === bookingId);
+    setConfirmationDialog({
+      isOpen: true,
+      action: 'reject',
+      bookingId,
+      bookingRef: booking?.bookingRef || 'N/A',
+      message: 'Are you sure you want to reject this booking? This action cannot be undone.',
+      onConfirm: async () => {
+        try {
+          setUpdatingStatus(bookingId);
+          const response = await bookingAPI.updateBookingStatus(bookingId, 'cancelled');
+          if (response.success) {
+            // Update the booking in the local state
+            setBookings(prevBookings =>
+              prevBookings.map(booking =>
+                booking.id === bookingId
+                  ? { ...booking, status: 'cancelled' }
+                  : booking
+              )
+            );
+            setConfirmationDialog({ isOpen: false, action: null, bookingId: null, bookingRef: null, message: '', onConfirm: null });
+          } else {
+            throw new Error(response.error?.message || 'Failed to reject booking');
+          }
+        } catch (err) {
+          console.error('Error rejecting booking:', err);
+          alert(err.message || 'Failed to reject booking. Please try again.');
+        } finally {
+          setUpdatingStatus(null);
+          setOpenDropdownId(null);
+        }
       }
-    } catch (err) {
-      console.error('Error rejecting booking:', err);
-      alert(err.message || 'Failed to reject booking. Please try again.');
-    } finally {
-      setUpdatingStatus(null);
-      setOpenDropdownId(null);
-    }
+    });
   };
 
   const handleCompleteBooking = async (bookingId) => {
-    if (!window.confirm('Mark this booking as completed?')) {
-      return;
-    }
-
-    try {
-      setUpdatingStatus(bookingId);
-      const response = await bookingAPI.updateBookingStatus(bookingId, 'completed');
-      if (response.success) {
-        // Update the booking in the local state
-        setBookings(prevBookings =>
-          prevBookings.map(booking =>
-            booking.id === bookingId
-              ? { ...booking, status: 'completed' }
-              : booking
-          )
-        );
-      } else {
-        throw new Error(response.error?.message || 'Failed to complete booking');
-      }
-    } catch (err) {
-      console.error('Error completing booking:', err);
-      alert(err.message || 'Failed to complete booking. Please try again.');
-    } finally {
-      setUpdatingStatus(null);
-      setOpenDropdownId(null);
-    }
-  };
-
-  const handleDeleteBooking = async (bookingId) => {
     const booking = bookings.find(b => b.id === bookingId);
-    const bookingRef = booking?.bookingRef || bookingId;
-    
-    if (!window.confirm(`Are you sure you want to delete booking ${bookingRef}? This action cannot be undone.`)) {
-      return;
-    }
-
-    try {
-      setUpdatingStatus(bookingId);
-      const response = await bookingAPI.deleteBooking(bookingId);
-      if (response.success) {
-        // Remove the booking from the local state
-        setBookings(prevBookings =>
-          prevBookings.filter(booking => booking.id !== bookingId)
-        );
-      } else {
-        throw new Error(response.error?.message || 'Failed to delete booking');
+    setConfirmationDialog({
+      isOpen: true,
+      action: 'complete',
+      bookingId,
+      bookingRef: booking?.bookingRef || 'N/A',
+      message: 'Mark this booking as completed?',
+      onConfirm: async () => {
+        try {
+          setUpdatingStatus(bookingId);
+          const response = await bookingAPI.updateBookingStatus(bookingId, 'completed');
+          if (response.success) {
+            // Update the booking in the local state
+            setBookings(prevBookings =>
+              prevBookings.map(booking =>
+                booking.id === bookingId
+                  ? { ...booking, status: 'completed' }
+                  : booking
+              )
+            );
+            setConfirmationDialog({ isOpen: false, action: null, bookingId: null, bookingRef: null, message: '', onConfirm: null });
+          } else {
+            throw new Error(response.error?.message || 'Failed to complete booking');
+          }
+        } catch (err) {
+          console.error('Error completing booking:', err);
+          alert(err.message || 'Failed to complete booking. Please try again.');
+        } finally {
+          setUpdatingStatus(null);
+          setOpenDropdownId(null);
+        }
       }
-    } catch (err) {
-      console.error('Error deleting booking:', err);
-      alert(err.message || 'Failed to delete booking. Please try again.');
-    } finally {
-      setUpdatingStatus(null);
-      setOpenDropdownId(null);
-    }
+    });
   };
 
   const handleLogout = () => {
@@ -772,14 +779,6 @@ export function Admin() {
                                               <Ban className="h-4 w-4" />
                                               Cancel
                                             </button>
-                                            <button
-                                              onClick={() => handleDeleteBooking(booking.id)}
-                                              disabled={updatingStatus === booking.id}
-                                              className="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed border-t border-slate-200 mt-1 pt-2"
-                                            >
-                                              <Trash2 className="h-4 w-4" />
-                                              Delete
-                                            </button>
                                           </>
                                         )}
                                         {booking.status?.toLowerCase() === 'confirmed' && (
@@ -859,14 +858,6 @@ export function Admin() {
                                     >
                                       <Ban className="h-4 w-4" />
                                       Cancel
-                                    </button>
-                                    <button
-                                      onClick={() => handleDeleteBooking(booking.id)}
-                                      disabled={updatingStatus === booking.id}
-                                      className="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed border-t border-slate-200 mt-1 pt-2"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                      Delete
                                     </button>
                                   </>
                                 )}
@@ -1186,6 +1177,124 @@ export function Admin() {
         </div>
       </main>
 
+      {/* Confirmation Dialog */}
+      <Dialog
+        isOpen={confirmationDialog.isOpen}
+        onClose={() => {
+          if (updatingStatus !== confirmationDialog.bookingId) {
+            setConfirmationDialog({ isOpen: false, action: null, bookingId: null, bookingRef: null, message: '', onConfirm: null });
+          }
+        }}
+        title=""
+        showCloseButton={updatingStatus !== confirmationDialog.bookingId}
+        maxWidth="sm"
+      >
+        {confirmationDialog.isOpen && (
+          <div className="space-y-4">
+            {/* Icon and Title */}
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className={cn(
+                "w-16 h-16 rounded-full flex items-center justify-center",
+                confirmationDialog.action === 'confirm' && "bg-green-100",
+                confirmationDialog.action === 'complete' && "bg-blue-100",
+                confirmationDialog.action === 'reject' && "bg-red-100"
+              )}>
+                {confirmationDialog.action === 'confirm' && (
+                  <CheckCircle className="h-8 w-8 text-green-600" />
+                )}
+                {confirmationDialog.action === 'complete' && (
+                  <CheckCircle className="h-8 w-8 text-blue-600" />
+                )}
+                {confirmationDialog.action === 'reject' && (
+                  <Ban className="h-8 w-8 text-red-600" />
+                )}
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  {confirmationDialog.action === 'confirm' && 'Confirm Booking'}
+                  {confirmationDialog.action === 'complete' && 'Complete Booking'}
+                  {confirmationDialog.action === 'reject' && 'Reject Booking'}
+                </h3>
+                <p className="text-sm text-slate-500 mt-1 font-mono">
+                  {confirmationDialog.bookingRef}
+                </p>
+              </div>
+            </div>
+
+            {/* Message */}
+            <div className="text-center">
+              <p className="text-slate-700">
+                {confirmationDialog.message}
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => {
+                  if (updatingStatus !== confirmationDialog.bookingId) {
+                    setConfirmationDialog({ isOpen: false, action: null, bookingId: null, bookingRef: null, message: '', onConfirm: null });
+                  }
+                }}
+                disabled={updatingStatus === confirmationDialog.bookingId}
+                className={cn(
+                  "flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors",
+                  updatingStatus === confirmationDialog.bookingId
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                )}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (confirmationDialog.onConfirm) {
+                    confirmationDialog.onConfirm();
+                  }
+                }}
+                disabled={updatingStatus === confirmationDialog.bookingId}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors text-white",
+                  updatingStatus === confirmationDialog.bookingId
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : confirmationDialog.action === 'confirm' && "bg-green-600 hover:bg-green-700",
+                    confirmationDialog.action === 'complete' && "bg-blue-600 hover:bg-blue-700",
+                    confirmationDialog.action === 'reject' && "bg-red-600 hover:bg-red-700"
+                )}
+              >
+                {updatingStatus === confirmationDialog.bookingId ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    {confirmationDialog.action === 'confirm' && (
+                      <>
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Confirm</span>
+                      </>
+                    )}
+                    {confirmationDialog.action === 'complete' && (
+                      <>
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Complete</span>
+                      </>
+                    )}
+                    {confirmationDialog.action === 'reject' && (
+                      <>
+                        <Ban className="h-4 w-4" />
+                        <span>Reject</span>
+                      </>
+                    )}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+      </Dialog>
+
       {/* Booking Details Dialog */}
       <Dialog
         isOpen={isDetailsOpen}
@@ -1334,8 +1443,8 @@ export function Admin() {
               <div className="flex gap-3 pt-4 border-t border-slate-200">
                 <button
                   onClick={() => {
-                    handleConfirmBooking(selectedBooking.id);
                     setIsDetailsOpen(false);
+                    setTimeout(() => handleConfirmBooking(selectedBooking.id), 100);
                   }}
                   disabled={updatingStatus === selectedBooking.id}
                   className={cn(
@@ -1359,8 +1468,8 @@ export function Admin() {
                 </button>
                 <button
                   onClick={() => {
-                    handleRejectBooking(selectedBooking.id);
                     setIsDetailsOpen(false);
+                    setTimeout(() => handleRejectBooking(selectedBooking.id), 100);
                   }}
                   disabled={updatingStatus === selectedBooking.id}
                   className={cn(

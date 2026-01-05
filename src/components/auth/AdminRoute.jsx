@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { Dialog } from '../ui/Dialog';
 import { Shield, AlertCircle, XCircle } from 'lucide-react';
 
@@ -11,6 +12,7 @@ import { Shield, AlertCircle, XCircle } from 'lucide-react';
  */
 export function AdminRoute({ children }) {
   const { isAuthenticated, isAdmin, login, isLoading } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -36,6 +38,7 @@ export function AdminRoute({ children }) {
       
       if (result.success) {
         setLoginError(null);
+        showToast('You are logged in', 'success', 3000);
         // If user is not admin after login, show access denied
         if (result.user?.role !== 'ADMIN') {
           setLoginError('Access denied. Admin privileges required.');

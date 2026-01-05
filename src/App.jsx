@@ -4,6 +4,7 @@ import { useGoogleOneTapLogin } from '@react-oauth/google';
 import { Layout } from './components/layout/Layout';
 import ScrollToTop from './components/utils/ScrollToTop';
 import { useAuth } from './context/AuthContext';
+import { useToast } from './context/ToastContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AdminRoute } from './components/auth/AdminRoute';
 
@@ -20,12 +21,16 @@ import { Admin } from './pages/Admin';
 
 function App() {
   const { login, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
 
   useGoogleOneTapLogin({
     onSuccess: async (credentialResponse) => {
       // credentialResponse.credential is the Google ID token
       // Pass it directly to login which will send it to backend
-      await login(credentialResponse.credential);
+      const result = await login(credentialResponse.credential);
+      if (result.success) {
+        showToast('You are logged in', 'success', 3000);
+      }
     },
     onError: () => {
       console.log('Google One Tap Auth Failed');

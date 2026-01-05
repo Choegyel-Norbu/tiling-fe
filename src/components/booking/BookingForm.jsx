@@ -309,12 +309,12 @@ export function BookingForm({ onSubmitted }) {
   return (
     <div className="max-w-4xl mx-auto my-8 md:my-12">
       {/* Mobile Header / Progress */}
-      <div className="mb-6 px-4 md:px-0">
-        <div className="flex justify-between items-end mb-2">
-          <div>
+      <div className="mb-6 md:px-0">
+        <div className="flex justify-end items-end mb-2">
+          {/* <div>
              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Book a Service</h1>
              <p className="text-slate-500 text-sm md:text-base hidden sm:block">Complete the form below to schedule your tiling service.</p>
-          </div>
+          </div> */}
           <div className="text-right">
             <span className="text-sm font-medium text-slate-500">Step {currentStep + 1} of {steps.length}</span>
             <p className="text-xs font-bold text-accent uppercase tracking-wide">{steps[currentStep].title}</p>
@@ -330,7 +330,7 @@ export function BookingForm({ onSubmitted }) {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden mx-4 md:mx-0">
+      <div className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden mx-0">
         {/* Desktop Stepper */}
         <div className="hidden md:flex bg-slate-50/50 border-b border-slate-100 p-6 justify-between px-12">
           {steps.map((step, index) => {
@@ -387,7 +387,7 @@ export function BookingForm({ onSubmitted }) {
 
                  {/* STEP 1: SERVICE */}
                  {currentStep === 0 && (
-                   <div className="space-y-6">
+                   <div className="space-y-0">
                      <div className="text-center md:text-left mb-8">
                         <h2 className="text-xl md:text-2xl font-bold text-slate-900">Select a Service</h2>
                         <p className="text-slate-500 mt-1">Choose the type of tiling service you require.</p>

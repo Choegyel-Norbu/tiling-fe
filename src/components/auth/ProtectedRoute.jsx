@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { Dialog } from '../ui/Dialog';
 import { AlertCircle, User } from 'lucide-react';
 
 export function ProtectedRoute({ children }) {
   const { isAuthenticated, login, isLoading } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -34,6 +36,7 @@ export function ProtectedRoute({ children }) {
       if (result.success) {
         // Login successful - dialog will close automatically
         setLoginError(null);
+        showToast('You are logged in', 'success', 3000);
       } else {
         setLoginError(result.error || 'Login failed. Please try again.');
       }

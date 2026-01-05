@@ -7,6 +7,7 @@ import { BookingForm } from '../components/booking/BookingForm';
 // COMMENTED OUT: useGeolocation hook - uncomment when re-enabling IP filter
 // import { useGeolocation } from '../hooks/useGeolocation';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { Dialog } from '../components/ui/Dialog';
 import { Loader2, User, AlertCircle } from 'lucide-react';
 
@@ -27,6 +28,7 @@ export function Booking() {
   const isGeolocationLoading = false; // Set to false to skip loading state
   
   const { isAuthenticated, login, isLoading: isAuthLoading } = useAuth();
+  const { showToast } = useToast();
 
   // Show loading state while detecting location or checking auth
   // COMMENTED OUT: Geolocation loading check - uncomment to re-enable IP filtering
@@ -64,6 +66,7 @@ export function Booking() {
       
       if (result.success) {
         setLoginError(null);
+        showToast('You are logged in', 'success', 3000);
       } else {
         setLoginError(result.error || 'Login failed. Please try again.');
       }
@@ -94,7 +97,7 @@ export function Booking() {
           <div className="container mx-auto px-4">
             {!isSubmitted && (
               <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold text-slate-900 mb-4">Book a Service</h1>
+                <h1 className="text-2xl font-bold text-slate-900 mb-4">Book a Service</h1>
                 <p className="text-sm text-slate-600 max-w-2xl mx-auto">
                   Schedule a free inspection or job booking in under 2 minutes. 
                   Tell us what you need and we'll take care of the rest.
