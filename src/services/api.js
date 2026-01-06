@@ -144,8 +144,14 @@ export const bookingAPI = {
     }
   },
 
-  async getBookings() {
-    return apiRequest('/bookings', {
+  /**
+   * Get all bookings (Admin only)
+   * @param {number} page - Page number (0-indexed)
+   * @param {number} limit - Number of items per page
+   * @returns {Promise} API response with paginated bookings
+   */
+  async getBookings(page = 0, limit = 10) {
+    return apiRequest(`/bookings?page=${page}&limit=${limit}`, {
       method: 'GET',
     });
   },

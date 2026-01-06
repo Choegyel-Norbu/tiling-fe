@@ -19,6 +19,8 @@ export function Admin() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [bookingsPage, setBookingsPage] = useState(0);
+  const [bookingsTotalPages, setBookingsTotalPages] = useState(0);
   
   // Confirmation dialog state
   const [confirmationDialog, setConfirmationDialog] = useState({
@@ -45,7 +47,7 @@ export function Admin() {
   // Fetch bookings on mount and when tab changes
   useEffect(() => {
     if (activeTab === 'bookings') {
-      fetchBookings();
+      fetchBookings(0);
     } else if (activeTab === 'notifications') {
       fetchNotifications(0);
     }
@@ -58,13 +60,15 @@ export function Admin() {
     }
   }, []);
 
-  const fetchBookings = async () => {
+  const fetchBookings = async (page = 0) => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await bookingAPI.getBookings();
-      if (response.success && response.data?.content) {
-        setBookings(response.data.content);
+      const response = await bookingAPI.getBookings(page, 10);
+      if (response.success && response.data) {
+        setBookings(response.data.content || []);
+        setBookingsPage(response.data.page || 0);
+        setBookingsTotalPages(response.data.totalPages || 0);
       } else {
         throw new Error(response.error?.message || 'Failed to fetch bookings');
       }
@@ -80,7 +84,7 @@ export function Admin() {
     try {
       setIsLoadingNotifications(true);
       setNotificationsError(null);
-      const response = await notificationsAPI.getNotifications(page, 20);
+      const response = await notificationsAPI.getNotifications(page, 10);
       if (response.success && response.data) {
         setNotifications(response.data.content || []);
         setNotificationsPage(response.data.page || 0);
@@ -611,7 +615,7 @@ export function Admin() {
                     <p className="font-medium">{error}</p>
                   </div>
                   <button
-                    onClick={fetchBookings}
+                    onClick={() => fetchBookings(bookingsPage)}
                     className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium"
                   >
                     Try Again
@@ -961,6 +965,37 @@ export function Admin() {
                       </div>
                     ))}
                   </div>
+                  {bookingsTotalPages > 1 && (
+                    <div className="mt-6 p-4 md:p-6 border-t border-slate-200 flex items-center justify-between bg-white rounded-b-xl">
+                      <button
+                        onClick={() => fetchBookings(bookingsPage - 1)}
+                        disabled={bookingsPage === 0}
+                        className={cn(
+                          "px-4 py-2 rounded-lg font-medium transition-colors",
+                          bookingsPage === 0
+                            ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                            : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                        )}
+                      >
+                        Previous
+                      </button>
+                      <span className="text-sm text-slate-600">
+                        Page {bookingsPage + 1} of {bookingsTotalPages}
+                      </span>
+                      <button
+                        onClick={() => fetchBookings(bookingsPage + 1)}
+                        disabled={bookingsPage >= bookingsTotalPages - 1}
+                        className={cn(
+                          "px-4 py-2 rounded-lg font-medium transition-colors",
+                          bookingsPage >= bookingsTotalPages - 1
+                            ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                            : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                        )}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
             </>
