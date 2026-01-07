@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Check, ChevronRight, ChevronLeft, Calendar, Upload, MapPin, 
   User as UserIcon, FileText, X as XIcon, AlertCircle, 
-  Briefcase, Image, Edit2, Loader2 
+  Briefcase, Image, Edit2, Loader2, Mail, Phone
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { services } from '../../data/services';
@@ -390,7 +390,6 @@ export function BookingForm({ onSubmitted }) {
                    <div className="space-y-0">
                      <div className="text-center md:text-left mb-8">
                         <h2 className="text-xl md:text-2xl font-bold text-slate-900">Select a Service</h2>
-                        <p className="text-slate-500 mt-1">Choose the type of tiling service you require.</p>
                      </div>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        {services.map((service) => (
@@ -556,7 +555,6 @@ export function BookingForm({ onSubmitted }) {
                      </div>
 
                      <div className="bg-blue-50/50 p-5 rounded-xl flex gap-3 text-blue-800 border border-blue-100">
-                       <Briefcase className="h-5 w-5 shrink-0 mt-0.5" />
                        <p className="text-sm leading-relaxed">
                          <strong>Note:</strong> This is a preferred time. We will confirm the actual appointment time with you via phone or email after reviewing the job requirements.
                        </p>
@@ -590,29 +588,35 @@ export function BookingForm({ onSubmitted }) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                           <div className="space-y-2">
                             <label className="text-sm font-semibold text-slate-700">Email</label>
-                            <input
-                              type="email"
-                              {...register('email', { 
-                                required: 'Email is required',
-                                pattern: { value: /^\S+@\S+$/i, message: 'Invalid email' }
-                              })}
-                              className="w-full h-12 rounded-xl border border-slate-200 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all bg-slate-50 focus:bg-white px-4"
-                              placeholder="john@example.com"
-                            />
+                            <div className="relative">
+                              <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-slate-400" />
+                              <input
+                                type="email"
+                                {...register('email', { 
+                                  required: 'Email is required',
+                                  pattern: { value: /^\S+@\S+$/i, message: 'Invalid email' }
+                                })}
+                                className="w-full pl-11 h-12 rounded-xl border border-slate-200 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all bg-slate-50 focus:bg-white"
+                                placeholder="john@example.com"
+                              />
+                            </div>
                             {errors.email && <p className="text-red-500 text-xs mt-1 ml-1">{errors.email.message}</p>}
                           </div>
                           
                           <div className="space-y-2">
                             <label className="text-sm font-semibold text-slate-700">Phone</label>
-                            <input
-                              type="tel"
-                              {...register('phone', { 
-                                required: 'Phone is required',
-                                validate: v => !v || isValidAustralianPhone(v) || 'Invalid phone'
-                              })}
-                              className="w-full h-12 rounded-xl border border-slate-200 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all bg-slate-50 focus:bg-white px-4"
-                              placeholder="0400 000 000"
-                            />
+                            <div className="relative">
+                              <Phone className="absolute left-3.5 top-3.5 h-5 w-5 text-slate-400" />
+                              <input
+                                type="tel"
+                                {...register('phone', { 
+                                  required: 'Phone is required',
+                                  validate: v => !v || isValidAustralianPhone(v) || 'Invalid phone'
+                                })}
+                                className="w-full pl-11 h-12 rounded-xl border border-slate-200 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all bg-slate-50 focus:bg-white"
+                                placeholder="0400 000 000"
+                              />
+                            </div>
                             {errors.phone && <p className="text-red-500 text-xs mt-1 ml-1">{errors.phone.message}</p>}
                           </div>
                         </div>

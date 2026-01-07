@@ -29,11 +29,11 @@ export function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-4">Services</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/services#bathroom" className="hover:text-accent transition-colors">Bathroom Tiling</Link></li>
-              <li><Link to="/services#kitchen" className="hover:text-accent transition-colors">Kitchen Splashbacks</Link></li>
-              <li><Link to="/services#floor" className="hover:text-accent transition-colors">Floor Tiling</Link></li>
-              <li><Link to="/services#outdoor" className="hover:text-accent transition-colors">Outdoor & Pools</Link></li>
+              <li><Link to="/services#tiling-renovation" className="hover:text-accent transition-colors">Tiling and Renovation</Link></li>
               <li><Link to="/services#waterproofing" className="hover:text-accent transition-colors">Waterproofing</Link></li>
+              <li><Link to="/services#screeding" className="hover:text-accent transition-colors">Screeding</Link></li>
+              <li><Link to="/services#grouting" className="hover:text-accent transition-colors">Grouting</Link></li>
+              <li><Link to="/services#vinyl-hybrid-flooring" className="hover:text-accent transition-colors">Vinyls and Hybrid Flooring</Link></li>
             </ul>
           </div>
 

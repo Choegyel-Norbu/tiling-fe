@@ -32,11 +32,11 @@ export function Navbar() {
   };
 
   const servicesMenu = [
-    { name: 'Bathroom Tiling', path: '/services#bathroom' },
-    { name: 'Kitchen Splashbacks', path: '/services#kitchen' },
-    { name: 'Floor Tiling', path: '/services#floor' },
-    { name: 'Outdoor & Pools', path: '/services#outdoor' },
+    { name: 'Tiling and Renovation', path: '/services#tiling-renovation' },
     { name: 'Waterproofing', path: '/services#waterproofing' },
+    { name: 'Screeding', path: '/services#screeding' },
+    { name: 'Grouting', path: '/services#grouting' },
+    { name: 'Vinyls and Hybrid Flooring', path: '/services#vinyl-hybrid-flooring' },
   ];
 
   const navLinks = [

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Clock, Award, Shield, ArrowRight, Star, Bath, ChefHat, Grid3X3, Sun, Droplets, Wrench } from 'lucide-react';
+import { CheckCircle, Clock, Award, Shield, ArrowRight, Star, Grid3X3, Droplets, Layers, Paintbrush, Square } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { BentoGrid, BentoCard } from '../components/ui/bento-grid';
 import CaseStudies from '../components/ui/case-studies';
@@ -14,48 +14,48 @@ import { projects } from '../data/projects';
 
 const features = [
   {
-    Icon: Bath,
-    name: "Bathroom Tiling",
-    description: "Complete bathroom renovations and waterproofing from floor to ceiling.",
-    href: "/services#bathroom",
-    cta: "View Service",
-    background: <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Bathroom" />,
-    className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
-  },
-  {
-    Icon: ChefHat,
-    name: "Kitchen Splashbacks",
-    description: "Modern splashbacks to protect and style your cooking space.",
-    href: "/services#kitchen",
-    cta: "View Service",
-    background: <img src="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Kitchen" />,
-    className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
-  },
-  {
     Icon: Grid3X3,
-    name: "Floor Tiling",
-    description: "Durable living area floors.",
-    href: "/services#floor",
+    name: "Tiling and Renovation",
+    description: "Complete tiling and renovation services for all interior spaces with expert installation.",
+    href: "/services#tiling-renovation",
     cta: "View Service",
-    background: <img src="https://images.unsplash.com/photo-1484154218962-a1c002085d2f?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Floor" />,
-    className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
-  },
-  {
-    Icon: Sun,
-    name: "Outdoor & Pools",
-    description: "Slip-resistant outdoor paving.",
-    href: "/services#outdoor",
-    cta: "View Service",
-    background: <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Outdoor" />,
-    className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
+    background: <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Tiling and Renovation" />,
+    className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
   },
   {
     Icon: Droplets,
     name: "Waterproofing",
-    description: "Certified leak prevention.",
+    description: "Certified waterproofing services to prevent leaks and structural damage.",
     href: "/services#waterproofing",
     cta: "View Service",
     background: <img src="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Waterproofing" />,
+    className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
+  },
+  {
+    Icon: Layers,
+    name: "Screeding",
+    description: "Professional floor screeding for level, smooth surfaces ready for installation.",
+    href: "/services#screeding",
+    cta: "View Service",
+    background: <img src="https://images.unsplash.com/photo-1484154218962-a1c002085d2f?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Screeding" />,
+    className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
+  },
+  {
+    Icon: Paintbrush,
+    name: "Grouting",
+    description: "Expert grouting services including new installations and restoration.",
+    href: "/services#grouting",
+    cta: "View Service",
+    background: <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Grouting" />,
+    className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
+  },
+  {
+    Icon: Square,
+    name: "Vinyls and Hybrid Flooring",
+    description: "Professional installation of luxury vinyl planks and hybrid flooring solutions.",
+    href: "/services#vinyl-hybrid-flooring",
+    cta: "View Service",
+    background: <img src="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Vinyls and Hybrid Flooring" />,
     className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
   },
 ];
@@ -81,7 +81,7 @@ export function Home() {
             </div>
 
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight tracking-tight">
-              Precision Tiling <br/>
+              Himalayan Tiling <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-yellow-600">
                 Masterfully Crafted
               </span>

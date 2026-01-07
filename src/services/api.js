@@ -359,37 +359,150 @@ export const fileAPI = {
 };
 
 /**
- * Helper to store authentication tokens
+ * Storage keys
  */
-export const authStorage = {
-  setToken(token) {
-    localStorage.setItem('jwt_token', token);
+const STORAGE_KEYS = {
+  TOKEN: 'jwt_token',
+  USER: 'user',
+};
+
+/**
+ * In-memory fallback storage for browsers that block localStorage
+ * (Safari private mode, some iOS settings, etc.)
+ */
+const memoryStorage = new Map();
+
+/**
+ * Checks if localStorage is available and working
+ * Handles Safari private mode, iOS restrictions, Android WebView issues
+ */
+function isLocalStorageAvailable() {
+  try {
+    const testKey = '__storage_test__';
+    localStorage.setItem(testKey, testKey);
+    localStorage.removeItem(testKey);
+    return true;
+  } catch (e) {
+    // localStorage not available (private mode, storage full, etc.)
+    return false;
+  }
+}
+
+/**
+ * Safe storage wrapper that handles all browser edge cases
+ */
+const safeStorage = {
+  setItem(key, value) {
+    try {
+      if (isLocalStorageAvailable()) {
+        localStorage.setItem(key, value);
+      } else {
+        memoryStorage.set(key, value);
+      }
+    } catch (e) {
+      // Fallback to memory if localStorage fails (quota exceeded, etc.)
+      console.warn('localStorage write failed, using memory fallback:', e);
+      memoryStorage.set(key, value);
+    }
   },
 
-  getToken() {
-    return localStorage.getItem('jwt_token');
+  getItem(key) {
+    try {
+      if (isLocalStorageAvailable()) {
+        return localStorage.getItem(key);
+      }
+      return memoryStorage.get(key) || null;
+    } catch (e) {
+      console.warn('localStorage read failed, using memory fallback:', e);
+      return memoryStorage.get(key) || null;
+    }
   },
 
-  removeToken() {
-    localStorage.removeItem('jwt_token');
-  },
-
-  setUser(user) {
-    localStorage.setItem('user', JSON.stringify(user));
-  },
-
-  getUser() {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
-  },
-
-  removeUser() {
-    localStorage.removeItem('user');
+  removeItem(key) {
+    try {
+      if (isLocalStorageAvailable()) {
+        localStorage.removeItem(key);
+      }
+      memoryStorage.delete(key);
+    } catch (e) {
+      console.warn('localStorage remove failed:', e);
+      memoryStorage.delete(key);
+    }
   },
 
   clear() {
-    this.removeToken();
-    this.removeUser();
+    try {
+      // Only clear our app-specific keys, not all localStorage
+      Object.values(STORAGE_KEYS).forEach(key => {
+        if (isLocalStorageAvailable()) {
+          localStorage.removeItem(key);
+        }
+        memoryStorage.delete(key);
+      });
+    } catch (e) {
+      console.warn('localStorage clear failed:', e);
+      memoryStorage.clear();
+    }
+  },
+};
+
+/**
+ * Helper to store authentication tokens
+ * Handles cross-browser compatibility (Chrome, Safari, iOS, Android)
+ * Token remains valid until user explicitly logs out
+ */
+export const authStorage = {
+  /**
+   * Store token
+   */
+  setToken(token) {
+    safeStorage.setItem(STORAGE_KEYS.TOKEN, token);
+  },
+
+  /**
+   * Get token (valid until user logs out)
+   */
+  getToken() {
+    return safeStorage.getItem(STORAGE_KEYS.TOKEN);
+  },
+
+  /**
+   * Check if token exists
+   */
+  isTokenValid() {
+    return this.getToken() !== null;
+  },
+
+  removeToken() {
+    safeStorage.removeItem(STORAGE_KEYS.TOKEN);
+  },
+
+  setUser(user) {
+    safeStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+  },
+
+  getUser() {
+    const user = safeStorage.getItem(STORAGE_KEYS.USER);
+    if (!user) {
+      return null;
+    }
+    try {
+      return JSON.parse(user);
+    } catch (e) {
+      console.warn('Failed to parse user data:', e);
+      return null;
+    }
+  },
+
+  removeUser() {
+    safeStorage.removeItem(STORAGE_KEYS.USER);
+  },
+
+  /**
+   * Clear all authentication data (called on logout)
+   */
+  clear() {
+    safeStorage.clear();
   },
 };
 
