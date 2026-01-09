@@ -70,7 +70,7 @@ export function Contact() {
         <div className="grid md:grid-cols-2 gap-12">
           {/* Info */}
           <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-8">Get In Touch</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-8">Get In Touch</h2>
             <div className="space-y-8">
               <div className="flex items-start gap-4">
                 <div className="bg-accent/10 p-3 rounded-lg shrink-0">
@@ -156,7 +156,7 @@ export function Contact() {
                 <div className="bg-accent/10 p-2 rounded-lg">
                   <Mail className="h-5 w-5 text-accent" />
                 </div>
-                <h3 className="text-3xl font-bold text-slate-900">Send us an Email</h3>
+                <h3 className="text-xl font-bold text-slate-900">Send us an Email</h3>
               </div>
               <p className="text-slate-600 text-sm ml-12">Fill out the form below and we'll get back to you soon</p>
             </div>

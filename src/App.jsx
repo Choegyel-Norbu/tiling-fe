@@ -20,7 +20,7 @@ import { Reviews } from './pages/Reviews';
 import { Admin } from './pages/Admin';
 
 function App() {
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, isLoading } = useAuth();
   const { showToast } = useToast();
 
   useGoogleOneTapLogin({
@@ -35,7 +35,8 @@ function App() {
     onError: () => {
       console.log('Google One Tap Auth Failed');
     },
-    disabled: isAuthenticated, // Don't show One Tap if already logged in
+    // Don't show One Tap while checking auth or if already logged in
+    disabled: isLoading || isAuthenticated,
   });
 
   return (
