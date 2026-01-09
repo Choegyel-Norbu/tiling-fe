@@ -2,18 +2,57 @@ import React, { useState } from 'react';
 import { projects } from '../data/projects';
 import { Button } from '../components/ui/Button';
 import { cn } from '../utils/cn';
-import { MapPin, Calendar, ZoomIn, ArrowRight } from 'lucide-react';
+import { MapPin, Calendar, ZoomIn, ArrowRight, Play, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useScreenSize } from '../hooks/use-screen-size';
 
-const categories = ['All', 'Bathroom', 'Living Room', 'Corridors & Stairs', 'Waterproofing'];
+const categories = ['All', 'Bathroom', 'Living Room', 'Corridors & Stairs', 'Waterproofing', 'Video'];
+
+const videos = [
+  {
+    id: 'video-1',
+    title: 'Bathroom Renovation Process',
+    description: 'See how we transform bathrooms with precision tiling and waterproofing',
+    videoUrl: 'https://mj2duw9tdo.ufs.sh/f/BgASbCYvfENuUVcwkdLsOEefHAPda8cKo2nuRbytjVBxZF0T',
+    thumbnail: null,
+  },
+  {
+    id: 'video-2',
+    title: 'Flooring Installation',
+    description: 'Professional installation of luxury vinyl and hybrid flooring',
+    videoUrl: 'https://mj2duw9tdo.ufs.sh/f/BgASbCYvfENuVNwKnZrzDiOQq2J7SCp5LuB6dxg4WPNRbTKs',
+    thumbnail: null,
+  },
+  {
+    id: 'video-3',
+    title: 'Complete Home Transformation',
+    description: 'From start to finish - a complete home renovation journey',
+    videoUrl: 'https://mj2duw9tdo.ufs.sh/f/BgASbCYvfENudB8EgeZcbpMF6hwnt0PKvBoeL1imS3RXjrgy',
+    thumbnail: null,
+  },
+  {
+    id: 'video-4',
+    title: 'Project Showcase',
+    description: 'Watch our latest tiling and renovation work in action',
+    videoUrl: 'https://mj2duw9tdo.ufs.sh/f/BgASbCYvfENuUVcwkdLsOEefHAPda8cKo2nuRbytjVBxZF0T',
+    thumbnail: null,
+  }
+];
 
 export function Gallery() {
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const screenSize = useScreenSize();
+  const isMobile = screenSize.lessThan('md');
 
   const filteredProjects = activeFilter === 'All' 
     ? projects 
+    : activeFilter === 'Video'
+    ? []
     : projects.filter(p => p.category === activeFilter);
+  
+  const showVideos = activeFilter === 'Video' || activeFilter === 'All';
 
   return (
     <div className="bg-slate-50 min-h-screen font-sans">
@@ -43,12 +82,62 @@ export function Gallery() {
       {/* Gallery Grid */}
       <section className="py-16 px-4 md:px-8">
         <div className="container mx-auto max-w-7xl">
-          <motion.div 
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            <AnimatePresence>
-              {filteredProjects.map((project) => (
+          {/* Mobile YouTube-style Video Layout */}
+          {isMobile && showVideos && videos.length > 0 && (
+            <div className={cn("mb-8", activeFilter === 'Video' && "mb-0")}>
+              {activeFilter === 'All' && (
+                <h2 className="text-2xl font-bold text-slate-900 mb-6 px-2">Videos</h2>
+              )}
+              <div className="space-y-4">
+                {videos.map((video) => (
+                  <motion.div
+                    key={video.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => setSelectedVideo(video)}
+                  >
+                    <div className="flex gap-3">
+                      {/* Thumbnail */}
+                      <div className="relative flex-shrink-0 w-40 h-24 bg-slate-900 rounded-lg overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
+                            <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
+                          </div>
+                        </div>
+                        {/* Video Badge */}
+                        <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                          VIDEO
+                        </div>
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="flex-1 py-2 pr-3 flex flex-col justify-center min-w-0">
+                        <h3 className="text-sm font-semibold text-slate-900 line-clamp-2 mb-1">
+                          {video.title}
+                        </h3>
+                        <p className="text-xs text-slate-500 line-clamp-2">
+                          {video.description}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Projects Grid - Hidden on mobile when showing videos separately */}
+          {!(isMobile && activeFilter === 'Video') && (
+            <motion.div 
+              layout
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              <AnimatePresence>
+                {/* Projects */}
+                {filteredProjects.map((project) => (
                 <motion.div
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -116,10 +205,65 @@ export function Gallery() {
                   </div>
                 </motion.div>
               ))}
-            </AnimatePresence>
-          </motion.div>
 
-          {filteredProjects.length === 0 && (
+              {/* Videos - Desktop/Tablet Grid View */}
+              {showVideos && !isMobile && videos.map((video) => (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                  key={video.id}
+                  className="group relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full"
+                >
+                  {/* Video Container */}
+                  <div className="relative aspect-[4/3] overflow-hidden cursor-pointer bg-slate-900" onClick={() => setSelectedVideo(video)}>
+                    <div className="w-full h-full relative group-hover:scale-105 transition-transform duration-700">
+                      <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+                        <div className="relative">
+                          <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                            <Play className="w-10 h-10 text-white ml-1" fill="white" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <Button variant="outline" className="text-black border-white hover:bg-white hover:text-black gap-2">
+                        <Play className="w-4 h-4" fill="currentColor" /> Play Video
+                      </Button>
+                    </div>
+                    
+                    {/* Video Badge */}
+                    <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-md tracking-wider">
+                      VIDEO
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6 flex flex-col flex-grow">
+                    <div className="mb-4">
+                      <span className="text-xs font-bold text-red-600 uppercase tracking-wider bg-red-50 px-2 py-1 rounded-md">
+                        Video
+                      </span>
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-red-600 transition-colors">
+                      {video.title}
+                    </h3>
+                    <p className="text-slate-600 text-sm mb-6 line-clamp-2 flex-grow">
+                      {video.description}
+                    </p>
+                  </div>
+                </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
+
+          {filteredProjects.length === 0 && activeFilter !== 'Video' && !(isMobile && activeFilter === 'Video') && (
             <div className="text-center py-32">
               <div className="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <ZoomIn className="w-8 h-8 text-slate-400" />
@@ -131,10 +275,20 @@ export function Gallery() {
               </Button>
             </div>
           )}
+
+          {activeFilter === 'Video' && videos.length === 0 && (
+            <div className="text-center py-32">
+              <div className="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Play className="w-8 h-8 text-slate-400" />
+              </div>
+              <h3 className="text-lg font-medium text-slate-900">No videos available</h3>
+              <p className="text-slate-500 mt-2">Check back soon for video content</p>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Lightbox Modal */}
+      {/* Lightbox Modal for Images */}
       <AnimatePresence>
         {selectedImage && (
           <motion.div 
@@ -175,7 +329,7 @@ export function Gallery() {
                   onClick={() => setSelectedImage(null)}
                   className="absolute top-4 right-4 p-2 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  <X className="w-5 h-5" />
                 </button>
 
                 <div className="mt-4">
@@ -206,6 +360,55 @@ export function Gallery() {
                     Start A Project Like This <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Video Modal */}
+      <AnimatePresence>
+        {selectedVideo && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-sm"
+            onClick={() => setSelectedVideo(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative max-w-6xl w-full max-h-[90vh] bg-black rounded-lg overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setSelectedVideo(null)}
+                className="absolute top-4 right-4 z-10 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors backdrop-blur-sm"
+                aria-label="Close video"
+              >
+                <X className="w-6 h-6 text-white" />
+              </button>
+
+              <div className="relative w-full aspect-video bg-black">
+                <video 
+                  src={selectedVideo.videoUrl}
+                  controls
+                  autoPlay
+                  className="w-full h-full"
+                  style={{ maxHeight: '90vh' }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+
+              <div className="p-6 bg-slate-900 text-white">
+                <div className="mb-2">
+                  <span className="text-xs font-bold text-red-500 uppercase tracking-wider">Video</span>
+                </div>
+                <h2 className="text-2xl font-bold mb-2">{selectedVideo.title}</h2>
+                <p className="text-slate-300 text-sm">{selectedVideo.description}</p>
               </div>
             </motion.div>
           </motion.div>
