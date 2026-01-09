@@ -36,6 +36,13 @@ const videos = [
     description: 'Watch our latest tiling and renovation work in action',
     videoUrl: 'https://mj2duw9tdo.ufs.sh/f/BgASbCYvfENuUVcwkdLsOEefHAPda8cKo2nuRbytjVBxZF0T',
     thumbnail: null,
+  },
+  {
+    id: 'video-5',
+    title: 'Tiling Excellence',
+    description: 'Showcasing our professional tiling techniques and craftsmanship',
+    videoUrl: 'https://mj2duw9tdo.ufs.sh/f/BgASbCYvfENuHFLy6MlLA2X1PZpQ3uF8kr6aUo0NICvVyOeE',
+    thumbnail: null,
   }
 ];
 

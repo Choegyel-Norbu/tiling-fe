@@ -161,7 +161,7 @@ export default function CaseStudies() {
             id="case-studies-heading"
             className="text-2xl font-bold text-slate-900 tracking-tight"
           >
-            Why Homeowners <br/> Trust <span className="text-accent">Himalayan</span>
+            Why Homeowners <br/> Trust <span className="text-accent">Himalayan Tiling</span>
           </h2>
           <p className="text-slate-600 text-sm">
             We don't just lay tiles; we craft spaces. Our commitment to excellence ensures that every project receives the same level of precision and care.

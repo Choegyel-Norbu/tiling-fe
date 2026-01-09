@@ -19,7 +19,7 @@ const features = [
     description: "Complete tiling and renovation services for all interior spaces with expert installation.",
     href: "/services#tiling-renovation",
     cta: "View Service",
-    background: <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Tiling and Renovation" />,
+    background: <img src="/bathroom1.jpeg" className="absolute inset-0 opacity-60 w-full h-full object-cover" alt="Tiling and Renovation" />,
     className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
   },
   {
@@ -28,7 +28,7 @@ const features = [
     description: "Certified waterproofing services to prevent leaks and structural damage.",
     href: "/services#waterproofing",
     cta: "View Service",
-    background: <img src="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Waterproofing" />,
+    background: <img src="/waterproofing.jpeg" className="absolute inset-0 opacity-60 w-full h-full object-cover" alt="Waterproofing" />,
     className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
   },
   {
@@ -37,7 +37,7 @@ const features = [
     description: "Professional floor screeding for level, smooth surfaces ready for installation.",
     href: "/services#screeding",
     cta: "View Service",
-    background: <img src="https://images.unsplash.com/photo-1484154218962-a1c002085d2f?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Screeding" />,
+    background: <img src="/corridors.jpeg" className="absolute inset-0 opacity-60 w-full h-full object-cover" alt="Screeding" />,
     className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
   },
   {
@@ -46,7 +46,7 @@ const features = [
     description: "Expert grouting services including new installations and restoration.",
     href: "/services#grouting",
     cta: "View Service",
-    background: <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Grouting" />,
+    background: <img src="/bathroom3.jpeg" className="absolute inset-0 opacity-60 w-full h-full object-cover" alt="Grouting" />,
     className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
   },
   {
@@ -55,7 +55,7 @@ const features = [
     description: "Professional installation of luxury vinyl planks and hybrid flooring solutions.",
     href: "/services#vinyl-hybrid-flooring",
     cta: "View Service",
-    background: <img src="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?q=80&w=1000&auto=format&fit=crop" className="absolute -right-20 -top-20 opacity-60 w-full h-full object-cover" alt="Vinyls and Hybrid Flooring" />,
+    background: <img src="/livingroom.jpeg" className="absolute inset-0 opacity-60 w-full h-full object-cover" alt="Vinyls and Hybrid Flooring" />,
     className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
   },
 ];
