@@ -46,9 +46,7 @@ export function Admin() {
 
   // Fetch bookings on mount and when tab changes
   useEffect(() => {
-    if (activeTab === 'bookings') {
-      fetchBookings(0);
-    } else if (activeTab === 'notifications') {
+    if (activeTab === 'notifications') {
       fetchNotifications(0);
     }
   }, [activeTab]);
@@ -59,6 +57,21 @@ export function Admin() {
       fetchNotifications(0);
     }
   }, []);
+
+  // Fetch bookings and handle search (with debounce for search queries)
+  useEffect(() => {
+    if (activeTab !== 'bookings') return;
+
+    const timeoutId = setTimeout(() => {
+      if (searchQuery.trim()) {
+        fetchBookingsWithSearch(searchQuery.trim(), 0);
+      } else {
+        fetchBookings(0);
+      }
+    }, searchQuery.trim() ? 500 : 0); // Only debounce when there's a search query
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, activeTab]);
 
   const fetchBookings = async (page = 0) => {
     try {
@@ -75,6 +88,26 @@ export function Admin() {
     } catch (err) {
       console.error('Error fetching bookings:', err);
       setError(err.message || 'Failed to load bookings');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchBookingsWithSearch = async (searchRef, page = 0) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await bookingAPI.searchBookings(searchRef, page, 20);
+      if (response.success && response.data) {
+        setBookings(response.data.content || []);
+        setBookingsPage(response.data.page || 0);
+        setBookingsTotalPages(response.data.totalPages || 0);
+      } else {
+        throw new Error(response.error?.message || 'Failed to search bookings');
+      }
+    } catch (err) {
+      console.error('Error searching bookings:', err);
+      setError(err.message || 'Failed to search bookings');
     } finally {
       setIsLoading(false);
     }
@@ -353,21 +386,9 @@ export function Admin() {
     }
   };
 
-  // Filter bookings based on search query
-  const filteredBookings = bookings.filter(booking => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      booking.bookingRef?.toLowerCase().includes(query) ||
-      booking.user?.name?.toLowerCase().includes(query) ||
-      booking.user?.email?.toLowerCase().includes(query) ||
-      booking.suburb?.toLowerCase().includes(query) ||
-      booking.postcode?.toLowerCase().includes(query)
-    );
-  });
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row">
+    <div className="h-screen bg-slate-100 flex flex-col md:flex-row overflow-hidden">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div 
@@ -377,7 +398,7 @@ export function Admin() {
       )}
 
       {/* Sidebar - Desktop */}
-      <aside className="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col">
+      <aside className="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col h-screen flex-shrink-0">
         <div className="p-6">
           <h1 className="text-2xl font-bold text-white tracking-tight">Himalayan Admin</h1>
         </div>
@@ -560,7 +581,7 @@ export function Admin() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
         <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 md:px-8">
            <div className="flex items-center gap-3">
@@ -581,8 +602,20 @@ export function Admin() {
                    placeholder="Search..." 
                    value={searchQuery}
                    onChange={(e) => setSearchQuery(e.target.value)}
-                   className="pl-8 md:pl-9 pr-3 md:pr-4 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:border-accent w-32 md:w-64" 
+                   className={cn(
+                     "pl-8 md:pl-9 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:border-accent w-32 md:w-64",
+                     searchQuery ? "pr-8 md:pr-9" : "pr-3 md:pr-4"
+                   )} 
                  />
+                 {searchQuery && (
+                   <button
+                     onClick={() => setSearchQuery('')}
+                     className="absolute right-2 md:right-3 top-2.5 h-4 w-4 text-slate-400 hover:text-slate-600 transition-colors"
+                     aria-label="Clear search"
+                   >
+                     <X className="h-4 w-4" />
+                   </button>
+                 )}
                </div>
              )}
              <button 
@@ -615,13 +648,19 @@ export function Admin() {
                     <p className="font-medium">{error}</p>
                   </div>
                   <button
-                    onClick={() => fetchBookings(bookingsPage)}
+                    onClick={() => {
+                      if (searchQuery.trim()) {
+                        fetchBookingsWithSearch(searchQuery.trim(), bookingsPage);
+                      } else {
+                        fetchBookings(bookingsPage);
+                      }
+                    }}
                     className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium"
                   >
                     Try Again
                   </button>
                 </div>
-              ) : filteredBookings.length === 0 ? (
+              ) : bookings.length === 0 ? (
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
                   <List className="h-12 w-12 text-slate-300 mx-auto mb-4" />
                   <p className="text-slate-600 font-medium">
@@ -630,8 +669,8 @@ export function Admin() {
                 </div>
               ) : (
                 <>
-                  {/* Desktop Table View */}
-                  <div className="hidden md:block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                  {/* Table View - All Screen Sizes */}
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-sm">
                         <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-200">
@@ -647,7 +686,9 @@ export function Admin() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                          {filteredBookings.map((booking) => (
+                          {bookings.map((booking, index) => {
+                            const isLastRow = index === bookings.length - 1;
+                            return (
                             <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
                               <td className="px-6 py-4">
                                 <span className="font-mono font-semibold text-slate-900">{booking.bookingRef}</span>
@@ -757,7 +798,10 @@ export function Admin() {
                                       )}
                                     </button>
                                     {openDropdownId === booking.id && (
-                                      <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-50 py-1">
+                                      <div className={cn(
+                                        "absolute right-0 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-50 py-1",
+                                        isLastRow ? "bottom-full mb-1" : "mt-1"
+                                      )}>
                                         <button
                                           onClick={() => handleViewDetails(booking)}
                                           className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
@@ -801,174 +845,22 @@ export function Admin() {
                                 </div>
                               </td>
                             </tr>
-                          ))}
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
                   </div>
-
-                  {/* Mobile Card View */}
-                  <div className="md:hidden space-y-4">
-                    {filteredBookings.map((booking) => (
-                      <div key={booking.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <span className="font-mono font-semibold text-slate-900 text-sm">{booking.bookingRef}</span>
-                            <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
-                              {booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1) || 'N/A'}
-                            </span>
-                          </div>
-                          {/* Action Menu - Top Right */}
-                          <div className="relative dropdown-container">
-                            <button
-                              onClick={() => setOpenDropdownId(openDropdownId === booking.id ? null : booking.id)}
-                              disabled={updatingStatus === booking.id}
-                              className={cn(
-                                "p-2 rounded-lg transition-colors",
-                                updatingStatus === booking.id
-                                  ? "text-slate-400 cursor-not-allowed"
-                                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                              )}
-                            >
-                              {updatingStatus === booking.id ? (
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                              ) : (
-                                <MoreVertical className="h-5 w-5" />
-                              )}
-                            </button>
-                            {openDropdownId === booking.id && (
-                              <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-50 py-1">
-                                <button
-                                  onClick={() => handleViewDetails(booking)}
-                                  className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
-                                >
-                                  <Eye className="h-4 w-4" />
-                                  View Details
-                                </button>
-                                {booking.status?.toLowerCase() === 'pending' && (
-                                  <>
-                                    <button
-                                      onClick={() => handleConfirmBooking(booking.id)}
-                                      disabled={updatingStatus === booking.id}
-                                      className="w-full px-4 py-2 text-left text-sm text-green-700 hover:bg-green-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                      <CheckCircle className="h-4 w-4" />
-                                      Confirm
-                                    </button>
-                                    <button
-                                      onClick={() => handleRejectBooking(booking.id)}
-                                      disabled={updatingStatus === booking.id}
-                                      className="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                      <Ban className="h-4 w-4" />
-                                      Cancel
-                                    </button>
-                                  </>
-                                )}
-                                {booking.status?.toLowerCase() === 'confirmed' && (
-                                  <button
-                                    onClick={() => handleCompleteBooking(booking.id)}
-                                    disabled={updatingStatus === booking.id}
-                                    className="w-full px-4 py-2 text-left text-sm text-blue-700 hover:bg-blue-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                  >
-                                    <CheckCircle className="h-4 w-4" />
-                                    Complete
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-3">
-                          {/* Customer Info */}
-                          <div>
-                            <p className="font-semibold text-slate-900 mb-1">{booking.user?.name || 'N/A'}</p>
-                            <div className="flex flex-col gap-1 text-xs text-slate-600">
-                              <div className="flex items-center gap-2">
-                                <Mail className="h-3 w-3" />
-                                <span className="truncate">{booking.user?.email || 'N/A'}</span>
-                              </div>
-                              {booking.customerPhone && (
-                                <div className="flex items-center gap-2">
-                                  <Phone className="h-3 w-3" />
-                                  <span>{booking.customerPhone}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Service & Job Size */}
-                          <div>
-                            <p className="text-sm font-medium text-slate-700">
-                              {getServiceName(booking.serviceId)}
-                              {booking.jobSize && (
-                                <span className="ml-2 text-xs text-slate-500 font-normal capitalize">({booking.jobSize})</span>
-                              )}
-                            </p>
-                          </div>
-
-                          {/* Date & Time */}
-                          <div className="flex items-center gap-4 text-sm">
-                            <div>
-                              <p className="text-slate-900 font-medium">{formatDate(booking.preferredDate)}</p>
-                              <p className="text-xs text-slate-500">{formatTimeSlot(booking.timeSlot)}</p>
-                            </div>
-                          </div>
-
-                          {/* Location */}
-                          <div className="flex items-center gap-2 text-sm text-slate-700">
-                            <MapPin className="h-4 w-4 text-slate-400" />
-                            <span>{booking.suburb}, {booking.postcode}</span>
-                          </div>
-
-                          {/* Files Preview */}
-                          {booking.files && booking.files.length > 0 && (
-                            <div>
-                              <p className="text-xs text-slate-500 mb-2">Files ({booking.files.length})</p>
-                              <div className="flex items-center gap-2 flex-wrap">
-                                {booking.files.slice(0, 3).map((file, idx) => {
-                                  const url = getFileUrl(file);
-                                  const isImage = file.mimeType?.startsWith('image/');
-                                  return (
-                                    <div
-                                      key={file.id || idx}
-                                      className="relative w-12 h-12 rounded-lg border border-slate-200 overflow-hidden bg-slate-100"
-                                      onClick={() => window.open(url, '_blank')}
-                                    >
-                                      {isImage ? (
-                                        <img
-                                          src={url}
-                                          alt={file.originalFilename}
-                                          className="w-full h-full object-cover"
-                                          onError={(e) => {
-                                            e.target.style.display = 'none';
-                                          }}
-                                        />
-                                      ) : (
-                                        <div className="w-full h-full flex items-center justify-center">
-                                          <FileText className="h-5 w-5 text-slate-400" />
-                                        </div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                                {booking.files.length > 3 && (
-                                  <div className="w-12 h-12 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center">
-                                    <span className="text-xs text-slate-500 font-medium">+{booking.files.length - 3}</span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                   {bookingsTotalPages > 1 && (
                     <div className="mt-6 p-4 md:p-6 border-t border-slate-200 flex items-center justify-between bg-white rounded-b-xl">
                       <button
-                        onClick={() => fetchBookings(bookingsPage - 1)}
+                        onClick={() => {
+                          if (searchQuery.trim()) {
+                            fetchBookingsWithSearch(searchQuery.trim(), bookingsPage - 1);
+                          } else {
+                            fetchBookings(bookingsPage - 1);
+                          }
+                        }}
                         disabled={bookingsPage === 0}
                         className={cn(
                           "px-4 py-2 rounded-lg font-medium transition-colors",
@@ -983,7 +875,13 @@ export function Admin() {
                         Page {bookingsPage + 1} of {bookingsTotalPages}
                       </span>
                       <button
-                        onClick={() => fetchBookings(bookingsPage + 1)}
+                        onClick={() => {
+                          if (searchQuery.trim()) {
+                            fetchBookingsWithSearch(searchQuery.trim(), bookingsPage + 1);
+                          } else {
+                            fetchBookings(bookingsPage + 1);
+                          }
+                        }}
                         disabled={bookingsPage >= bookingsTotalPages - 1}
                         className={cn(
                           "px-4 py-2 rounded-lg font-medium transition-colors",

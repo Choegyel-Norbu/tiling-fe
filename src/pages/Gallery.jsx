@@ -118,7 +118,7 @@ export function Gallery() {
       <section className={cn(
         "sticky top-16 z-30 py-4 shadow-sm transition-all duration-300",
         showShorts 
-          ? "fixed top-0 left-0 right-0 bg-transparent backdrop-blur-md border-b border-white/10 z-50" 
+          ? "fixed top-0 left-0 right-0 bg-black/80 backdrop-blur-md border-b border-white/20 z-50" 
           : "bg-white/80 backdrop-blur-md border-b border-slate-200"
       )}>
         <div className="container mx-auto px-4 overflow-x-auto no-scrollbar">
@@ -139,8 +139,8 @@ export function Gallery() {
                   "px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 focus:outline-none focus:ring-0",
                   showShorts
                     ? activeFilter === cat
-                      ? "bg-white text-black scale-105" 
-                      : "bg-white/20 text-white border border-white/30 hover:bg-white/30 hover:border-white/50"
+                      ? "bg-white text-black scale-105 font-semibold shadow-lg" 
+                      : "bg-white/40 text-white border border-white/50 hover:bg-white/50 hover:border-white/70"
                     : activeFilter === cat 
                       ? "bg-slate-900 text-white scale-105" 
                       : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"

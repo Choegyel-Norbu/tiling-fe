@@ -157,6 +157,19 @@ export const bookingAPI = {
   },
 
   /**
+   * Search bookings by reference (Admin only)
+   * @param {string} ref - Booking reference to search for
+   * @param {number} page - Page number (0-indexed)
+   * @param {number} limit - Number of items per page
+   * @returns {Promise} API response with paginated search results
+   */
+  async searchBookings(ref, page = 0, limit = 20) {
+    return apiRequest(`/bookings/search?ref=${encodeURIComponent(ref)}&page=${page}&limit=${limit}`, {
+      method: 'GET',
+    });
+  },
+
+  /**
    * Get current user's bookings
    * @returns {Promise} API response with user's bookings (paginated)
    */
