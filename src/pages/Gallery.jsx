@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { projects } from '../data/projects';
 import { Button } from '../components/ui/Button';
 import { cn } from '../utils/cn';
-import { MapPin, Calendar, ZoomIn, ArrowRight, Play, X } from 'lucide-react';
+import { MapPin, Calendar, ZoomIn, ArrowRight, Play, X, Pause, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useScreenSize } from '../hooks/use-screen-size';
 
-const categories = ['All', 'Bathroom', 'Living Room', 'Corridors & Stairs', 'Waterproofing', 'Video'];
+const categories = ['All', 'Video', 'Shorts', 'Bathroom', 'Living Room', 'Corridors & Stairs', 'Waterproofing'];
 
 const videos = [
   {
@@ -50,33 +50,100 @@ export function Gallery() {
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [currentShortIndex, setCurrentShortIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRefs = useRef([]);
+  const shortsContainerRef = useRef(null);
   const screenSize = useScreenSize();
   const isMobile = screenSize.lessThan('md');
 
   const filteredProjects = activeFilter === 'All' 
     ? projects 
-    : activeFilter === 'Video'
+    : activeFilter === 'Video' || activeFilter === 'Shorts'
     ? []
     : projects.filter(p => p.category === activeFilter);
   
   const showVideos = activeFilter === 'Video' || activeFilter === 'All';
+  const showShorts = activeFilter === 'Shorts';
+
+  // Prevent body scroll when shorts are active
+  useEffect(() => {
+    if (showShorts) {
+      // Disable body scroll
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      
+      // Scroll to top
+      window.scrollTo(0, 0);
+    } else {
+      // Re-enable body scroll
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+    
+    return () => {
+      // Cleanup on unmount
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [showShorts]);
+
+  // Auto-play current short when index changes
+  useEffect(() => {
+    if (showShorts && videoRefs.current[currentShortIndex]) {
+      // Pause all videos
+      videoRefs.current.forEach((video) => {
+        if (video) video.pause();
+      });
+      // Play current video
+      setTimeout(() => {
+        if (videoRefs.current[currentShortIndex]) {
+          videoRefs.current[currentShortIndex].play().catch(() => {
+            // Autoplay blocked, user interaction required
+            setIsPlaying(false);
+          });
+        }
+      }, 300);
+    }
+  }, [currentShortIndex, showShorts]);
 
   return (
     <div className="bg-slate-50 min-h-screen font-sans">
 
       {/* Filter Section */}
-      <section className="sticky top-16 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 py-4 shadow-sm">
+      <section className={cn(
+        "sticky top-16 z-30 py-4 shadow-sm transition-all duration-300",
+        showShorts 
+          ? "fixed top-0 left-0 right-0 bg-transparent backdrop-blur-md border-b border-white/10 z-50" 
+          : "bg-white/80 backdrop-blur-md border-b border-slate-200"
+      )}>
         <div className="container mx-auto px-4 overflow-x-auto no-scrollbar">
           <div className="flex space-x-2 md:justify-center min-w-max px-2">
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setActiveFilter(cat)}
+                onClick={() => {
+                  setActiveFilter(cat);
+                  if (cat === 'Shorts') {
+                    setCurrentShortIndex(0);
+                    setIsPlaying(true);
+                  } else {
+                    setIsPlaying(false);
+                  }
+                }}
                 className={cn(
-                  "px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300",
-                  activeFilter === cat 
-                    ? "bg-slate-900 text-white shadow-md scale-105" 
-                    : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                  "px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 focus:outline-none focus:ring-0",
+                  showShorts
+                    ? activeFilter === cat
+                      ? "bg-white text-black scale-105" 
+                      : "bg-white/20 text-white border border-white/30 hover:bg-white/30 hover:border-white/50"
+                    : activeFilter === cat 
+                      ? "bg-slate-900 text-white scale-105" 
+                      : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                 )}
               >
                 {cat}
@@ -86,7 +153,154 @@ export function Gallery() {
         </div>
       </section>
 
+      {/* TikTok/Reels Style Shorts Feed */}
+      {showShorts && (
+        <section className="fixed inset-0 bg-black z-40 overflow-hidden" style={{ top: '64px', height: 'calc(100vh - 64px)' }}>
+          <div 
+            ref={shortsContainerRef}
+            className="relative h-full w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar"
+            style={{ scrollSnapType: 'y mandatory' }}
+            onScroll={(e) => {
+              const container = e.currentTarget;
+              const scrollTop = container.scrollTop;
+              const containerHeight = container.clientHeight;
+              const newIndex = Math.round(scrollTop / containerHeight);
+              if (newIndex !== currentShortIndex && newIndex >= 0 && newIndex < videos.length) {
+                setCurrentShortIndex(newIndex);
+              }
+            }}
+            onWheel={(e) => {
+              // Prevent window scroll when scrolling in shorts container
+              e.stopPropagation();
+            }}
+            onTouchMove={(e) => {
+              // Prevent default to stop window scroll
+              e.preventDefault();
+            }}
+          >
+            {videos.map((video, index) => (
+              <div
+                key={video.id}
+                className="relative w-full flex items-center justify-center snap-start snap-always"
+                style={{ height: 'calc(100vh - 64px)', minHeight: 'calc(100vh - 64px)' }}
+              >
+                <div className="relative w-full h-full max-w-md mx-auto bg-black" style={{ height: 'calc(100vh - 64px)' }}>
+                  {/* Video Player */}
+                  <div 
+                    className="relative w-full h-full flex items-center justify-center"
+                    onClick={() => {
+                      const videoEl = videoRefs.current[index];
+                      if (videoEl) {
+                        if (videoEl.paused) {
+                          videoEl.play();
+                          setIsPlaying(true);
+                        } else {
+                          videoEl.pause();
+                          setIsPlaying(false);
+                        }
+                      }
+                    }}
+                  >
+                    <video
+                      ref={(el) => (videoRefs.current[index] = el)}
+                      src={video.videoUrl}
+                      className="w-full h-full object-cover"
+                      loop
+                      muted={isMuted}
+                      playsInline
+                      onPlay={() => {
+                        if (index === currentShortIndex) setIsPlaying(true);
+                      }}
+                      onPause={() => {
+                        if (index === currentShortIndex) setIsPlaying(false);
+                      }}
+                    />
+                    
+                    {/* Play/Pause Overlay */}
+                    {!isPlaying && index === currentShortIndex && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none"
+                      >
+                        <div className="w-20 h-20 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
+                          <Play className="w-10 h-10 text-white ml-1" fill="white" />
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Video Info Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6 pb-8 pointer-events-none">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-white font-bold text-lg md:text-xl mb-2 line-clamp-2">
+                            {video.title}
+                          </h3>
+                          <p className="text-white/80 text-sm md:text-base line-clamp-2">
+                            {video.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Controls */}
+                    <div className="absolute right-4 bottom-32 flex flex-col gap-4 z-10">
+                      {/* Mute/Unmute */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const newMuted = !isMuted;
+                          setIsMuted(newMuted);
+                          videoRefs.current.forEach((videoEl) => {
+                            if (videoEl) videoEl.muted = newMuted;
+                          });
+                        }}
+                        className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border-2 border-white/30 hover:bg-black/80 transition-colors"
+                      >
+                        {isMuted ? (
+                          <VolumeX className="w-5 h-5 text-white" />
+                        ) : (
+                          <Volume2 className="w-5 h-5 text-white" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Scroll Indicator */}
+          <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-20 flex flex-col gap-2 pointer-events-none md:pointer-events-auto">
+            {videos.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setCurrentShortIndex(index);
+                  const container = shortsContainerRef.current;
+                  if (container) {
+                    const containerHeight = container.clientHeight;
+                    container.scrollTo({
+                      top: index * containerHeight,
+                      behavior: 'smooth'
+                    });
+                  }
+                }}
+                className={cn(
+                  "w-1.5 rounded-full transition-all duration-300",
+                  index === currentShortIndex 
+                    ? "h-12 bg-white" 
+                    : "h-6 bg-white/40 hover:bg-white/60"
+                )}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Gallery Grid */}
+      {!showShorts && (
       <section className="py-16 px-4 md:px-8">
         <div className="container mx-auto max-w-7xl">
           {/* Mobile YouTube-style Video Layout */}
@@ -294,6 +508,7 @@ export function Gallery() {
           )}
         </div>
       </section>
+      )}
 
       {/* Lightbox Modal for Images */}
       <AnimatePresence>
@@ -423,6 +638,7 @@ export function Gallery() {
       </AnimatePresence>
 
       {/* CTA Section */}
+      {!showShorts && (
       <section className="bg-slate-900 text-white py-20 text-center relative overflow-hidden">
          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-slate-900 to-slate-900 pointer-events-none" />
          <div className="container mx-auto px-4 relative z-10">
@@ -435,6 +651,7 @@ export function Gallery() {
           </Button>
         </div>
       </section>
+      )}
     </div>
   );
 }

@@ -79,4 +79,21 @@
   .animate-grid {
     animation: grid 15s linear infinite;
   }
+  
+  /* Hide scrollbar but keep functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar-track {
+    display: none;
+  }
+  .no-scrollbar::-webkit-scrollbar-thumb {
+    display: none;
+  }
 }

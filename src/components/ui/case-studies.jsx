@@ -186,7 +186,6 @@ export default function CaseStudies() {
                   ].join(" ")}
                 >
                   <div className="relative group max-w-md mx-auto lg:max-w-sm">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-accent to-yellow-200 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
                     <img
                       src={study.image}
                       alt={study.title}
