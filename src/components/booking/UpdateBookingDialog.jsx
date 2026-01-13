@@ -441,7 +441,7 @@ export function UpdateBookingDialog({ booking, isOpen, onClose, onUpdateSuccess 
                 onChange={(e) => handleChange('phone', e.target.value)}
                 required
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:border-accent focus:ring-1 focus:ring-accent outline-none"
-                placeholder="0400 000 000"
+                placeholder="0451 270 951"
               />
             </div>
           </div>

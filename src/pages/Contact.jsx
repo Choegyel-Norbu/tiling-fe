@@ -79,7 +79,7 @@ export function Contact() {
                 <div>
                   <h3 className="font-bold text-sm text-slate-900">Phone</h3>
                   <p className="text-sm text-slate-600 mb-1">Mon-Fri from 8am to 6pm</p>
-                  <a href="tel:0400000000" className="text-sm text-accent font-semibold hover:underline">0400 000 000</a>
+                  <a href="tel:0451270951" className="text-sm text-accent font-semibold hover:underline">0451 270 951</a>
                 </div>
               </div>
 
@@ -101,9 +101,7 @@ export function Contact() {
                 <div>
                   <h3 className="font-bold text-sm text-slate-900">Office</h3>
                   <p className="text-sm text-slate-600">
-                    123 Trade Street<br />
-                    Parramatta NSW 2150<br />
-                    Australia
+                    Perth Western Australia
                   </p>
                 </div>
               </div>
@@ -237,7 +235,7 @@ export function Contact() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="0400 000 000 or 02 1234 5678"
+                    placeholder="0451 270 951 or 02 1234 5678"
                     className={`w-full px-4 py-3 pl-11 rounded-xl border-2 transition-all duration-200 bg-white/80 backdrop-blur-sm
                       ${errors.phone 
                         ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-200' 

@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { projects } from '../data/projects';
 import { Button } from '../components/ui/Button';
 import { cn } from '../utils/cn';
-import { MapPin, Calendar, ZoomIn, ArrowRight, Play, X, Pause, Volume2, VolumeX } from 'lucide-react';
+import { MapPin, Calendar, ZoomIn, ArrowRight, Play, X, Pause, Volume2, VolumeX, Loader2, Share2, Calendar as CalendarIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useScreenSize } from '../hooks/use-screen-size';
 
@@ -47,12 +48,14 @@ const videos = [
 ];
 
 export function Gallery() {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [currentShortIndex, setCurrentShortIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [videoLoadingStates, setVideoLoadingStates] = useState({});
   const videoRefs = useRef([]);
   const shortsContainerRef = useRef(null);
   const screenSize = useScreenSize();
@@ -118,7 +121,7 @@ export function Gallery() {
       <section className={cn(
         "sticky top-16 z-30 py-4 shadow-sm transition-all duration-300",
         showShorts 
-          ? "fixed top-0 left-0 right-0 bg-black/80 backdrop-blur-md border-b border-white/20 z-50" 
+          ? "fixed top-0 left-0 right-0 bg-black/80 md:bg-white/95 backdrop-blur-md border-b border-white/20 md:border-slate-200 z-50" 
           : "bg-white/80 backdrop-blur-md border-b border-slate-200"
       )}>
         <div className="container mx-auto px-4 overflow-x-auto no-scrollbar">
@@ -139,8 +142,8 @@ export function Gallery() {
                   "px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 focus:outline-none focus:ring-0",
                   showShorts
                     ? activeFilter === cat
-                      ? "bg-white text-black scale-105 font-semibold shadow-lg" 
-                      : "bg-white/40 text-white border border-white/50 hover:bg-white/50 hover:border-white/70"
+                      ? "bg-white md:bg-slate-900 text-black md:text-white scale-105 font-semibold shadow-lg" 
+                      : "bg-white/40 md:bg-white text-white md:text-slate-600 border border-white/50 md:border-slate-200 hover:bg-white/50 md:hover:bg-slate-50 hover:border-white/70 md:hover:border-slate-300"
                     : activeFilter === cat 
                       ? "bg-slate-900 text-white scale-105" 
                       : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
@@ -155,7 +158,7 @@ export function Gallery() {
 
       {/* TikTok/Reels Style Shorts Feed */}
       {showShorts && (
-        <section className="fixed inset-0 bg-black z-40 overflow-hidden" style={{ top: '64px', height: 'calc(100vh - 64px)' }}>
+        <section className="fixed inset-0 bg-white md:bg-slate-50 z-40 overflow-hidden" style={{ top: '64px', height: 'calc(100vh - 64px)' }}>
           <div 
             ref={shortsContainerRef}
             className="relative h-full w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar"
@@ -178,97 +181,170 @@ export function Gallery() {
               e.preventDefault();
             }}
           >
-            {videos.map((video, index) => (
-              <div
-                key={video.id}
-                className="relative w-full flex items-center justify-center snap-start snap-always"
-                style={{ height: 'calc(100vh - 64px)', minHeight: 'calc(100vh - 64px)' }}
-              >
-                <div className="relative w-full h-full max-w-md mx-auto bg-black" style={{ height: 'calc(100vh - 64px)' }}>
-                  {/* Video Player */}
-                  <div 
-                    className="relative w-full h-full flex items-center justify-center"
-                    onClick={() => {
-                      const videoEl = videoRefs.current[index];
-                      if (videoEl) {
-                        if (videoEl.paused) {
-                          videoEl.play();
-                          setIsPlaying(true);
-                        } else {
-                          videoEl.pause();
-                          setIsPlaying(false);
+            {videos.map((video, index) => {
+              const isLoading = videoLoadingStates[video.id] !== false;
+              
+              return (
+                <div
+                  key={video.id}
+                  className="relative w-full flex items-center justify-center snap-start snap-always"
+                  style={{ height: 'calc(100vh - 64px)', minHeight: 'calc(100vh - 64px)' }}
+                >
+                  <div className="relative w-full h-full max-w-md mx-auto bg-black md:bg-white md:shadow-2xl md:overflow-hidden" style={{ height: 'calc(100vh - 64px)' }}>
+                    {/* Video Player */}
+                    <div 
+                      className="relative w-full h-full flex items-center justify-center"
+                      onClick={() => {
+                        const videoEl = videoRefs.current[index];
+                        if (videoEl && !isLoading) {
+                          if (videoEl.paused) {
+                            videoEl.play();
+                            setIsPlaying(true);
+                          } else {
+                            videoEl.pause();
+                            setIsPlaying(false);
+                          }
                         }
-                      }
-                    }}
-                  >
-                    <video
-                      ref={(el) => (videoRefs.current[index] = el)}
-                      src={video.videoUrl}
-                      className="w-full h-full object-cover"
-                      loop
-                      muted={isMuted}
-                      playsInline
-                      onPlay={() => {
-                        if (index === currentShortIndex) setIsPlaying(true);
                       }}
-                      onPause={() => {
-                        if (index === currentShortIndex) setIsPlaying(false);
-                      }}
-                    />
-                    
-                    {/* Play/Pause Overlay */}
-                    {!isPlaying && index === currentShortIndex && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none"
-                      >
-                        <div className="w-20 h-20 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
-                          <Play className="w-10 h-10 text-white ml-1" fill="white" />
+                    >
+                      {/* Placeholder Image while loading */}
+                      {isLoading && (
+                        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 flex items-center justify-center">
+                          <div className="absolute inset-0 opacity-20">
+                            <div className="w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-accent/20 via-slate-700/30 to-slate-900" />
+                          </div>
+                          <div className="relative z-10 flex flex-col items-center gap-4">
+                            <Loader2 className="w-12 h-12 text-white animate-spin" />
+                            <p className="text-white/80 text-sm font-medium">Loading video...</p>
+                          </div>
                         </div>
-                      </motion.div>
-                    )}
-
-                    {/* Video Info Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6 pb-8 pointer-events-none">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-white font-bold text-lg md:text-xl mb-2 line-clamp-2">
-                            {video.title}
-                          </h3>
-                          <p className="text-white/80 text-sm md:text-base line-clamp-2">
-                            {video.description}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Controls */}
-                    <div className="absolute right-4 bottom-32 flex flex-col gap-4 z-10">
-                      {/* Mute/Unmute */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const newMuted = !isMuted;
-                          setIsMuted(newMuted);
-                          videoRefs.current.forEach((videoEl) => {
-                            if (videoEl) videoEl.muted = newMuted;
-                          });
-                        }}
-                        className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border-2 border-white/30 hover:bg-black/80 transition-colors"
-                      >
-                        {isMuted ? (
-                          <VolumeX className="w-5 h-5 text-white" />
-                        ) : (
-                          <Volume2 className="w-5 h-5 text-white" />
+                      )}
+                      
+                      <video
+                        ref={(el) => (videoRefs.current[index] = el)}
+                        src={video.videoUrl}
+                        className={cn(
+                          "w-full h-full object-cover transition-opacity duration-300",
+                          isLoading ? "opacity-0" : "opacity-100"
                         )}
-                      </button>
+                        loop
+                        muted={isMuted}
+                        playsInline
+                        onLoadStart={() => {
+                          setVideoLoadingStates(prev => ({ ...prev, [video.id]: true }));
+                        }}
+                        onCanPlay={() => {
+                          setVideoLoadingStates(prev => ({ ...prev, [video.id]: false }));
+                        }}
+                        onWaiting={() => {
+                          setVideoLoadingStates(prev => ({ ...prev, [video.id]: true }));
+                        }}
+                        onPlay={() => {
+                          if (index === currentShortIndex) {
+                            setIsPlaying(true);
+                            setVideoLoadingStates(prev => ({ ...prev, [video.id]: false }));
+                          }
+                        }}
+                        onPause={() => {
+                          if (index === currentShortIndex) setIsPlaying(false);
+                        }}
+                      />
+                      
+                      {/* Play/Pause Overlay */}
+                      {!isPlaying && !isLoading && index === currentShortIndex && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
+                          <div className="w-20 h-20 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
+                            <Play className="w-10 h-10 text-white ml-1" fill="white" />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Video Info Overlay */}
+                      {!isLoading && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6 pb-8 pointer-events-none">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-white font-bold text-lg md:text-xl mb-2 line-clamp-2">
+                                {video.title}
+                              </h3>
+                              <p className="text-white/80 text-sm md:text-base line-clamp-2">
+                                {video.description}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Controls */}
+                      {!isLoading && (
+                        <div className="absolute right-4 bottom-32 flex flex-col gap-4 z-10">
+                          {/* Share Button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const shareData = {
+                                title: video.title,
+                                text: video.description,
+                                url: window.location.href,
+                              };
+                              
+                              if (navigator.share) {
+                                navigator.share(shareData).catch((err) => {
+                                  console.log('Error sharing:', err);
+                                  // Fallback: copy to clipboard
+                                  navigator.clipboard.writeText(window.location.href);
+                                });
+                              } else {
+                                // Fallback: copy to clipboard
+                                navigator.clipboard.writeText(window.location.href).then(() => {
+                                  // Could show a toast here if you have a toast system
+                                });
+                              }
+                            }}
+                            className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border-2 border-white/30 hover:bg-black/80 transition-colors"
+                            aria-label="Share video"
+                          >
+                            <Share2 className="w-5 h-5 text-white" />
+                          </button>
+                          
+                          {/* Book Job Button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate('/booking');
+                            }}
+                            className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border-2 border-white/30 hover:bg-black/80 transition-colors"
+                            aria-label="Book a job"
+                          >
+                            <CalendarIcon className="w-5 h-5 text-white" />
+                          </button>
+                          
+                          {/* Mute/Unmute */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const newMuted = !isMuted;
+                              setIsMuted(newMuted);
+                              videoRefs.current.forEach((videoEl) => {
+                                if (videoEl) videoEl.muted = newMuted;
+                              });
+                            }}
+                            className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border-2 border-white/30 hover:bg-black/80 transition-colors"
+                            aria-label={isMuted ? "Unmute" : "Mute"}
+                          >
+                            {isMuted ? (
+                              <VolumeX className="w-5 h-5 text-white" />
+                            ) : (
+                              <Volume2 className="w-5 h-5 text-white" />
+                            )}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Scroll Indicator */}
@@ -290,8 +366,8 @@ export function Gallery() {
                 className={cn(
                   "w-1.5 rounded-full transition-all duration-300",
                   index === currentShortIndex 
-                    ? "h-12 bg-white" 
-                    : "h-6 bg-white/40 hover:bg-white/60"
+                    ? "h-12 bg-slate-900 md:bg-slate-700" 
+                    : "h-6 bg-slate-900/40 md:bg-slate-700/40 hover:bg-slate-900/60 md:hover:bg-slate-700/60"
                 )}
               />
             ))}

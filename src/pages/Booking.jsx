@@ -110,7 +110,7 @@ export function Booking() {
             {!isSubmitted && (
               <div className="max-w-3xl mx-auto mt-8 text-center text-sm text-slate-500">
                 <p>
-                  Need help? Call us directly on <a href="tel:0400000000" className="text-accent font-bold">0400 000 000</a>
+                  Need help? Call us directly on <a href="tel:0451270951" className="text-accent font-bold">0451 270 951</a>
                 </p>
               </div>
             )}

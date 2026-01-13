@@ -130,9 +130,9 @@ export function Navbar() {
               </AnimatePresence>
             </div>
           <div className="flex items-center gap-2 lg:gap-4 ml-2 lg:ml-4 flex-shrink-0">
-            <a href="tel:+61400000000" className="hidden xl:flex items-center gap-2 text-slate-600 hover:text-accent font-medium text-sm cursor-pointer">
+            <a href="tel:+61451270951" className="hidden xl:flex items-center gap-2 text-slate-600 hover:text-accent font-medium text-sm cursor-pointer">
               <Phone className="h-4 w-4" />
-              <span>0400 000 000</span>
+              <span>0451 270 951</span>
             </a>
             <Link to="/booking" className="cursor-pointer">
               <Button className="bg-accent text-white hover:bg-yellow-600 text-xs lg:text-sm px-3 lg:px-4">Book a Job</Button>
@@ -310,9 +310,9 @@ export function Navbar() {
               </Link>
             ))}
             <div className="pt-4 border-t border-slate-800 mt-4">
-              <a href="tel:+61400000000" className="flex items-center gap-2 text-slate-300 px-3 py-2 cursor-pointer">
+              <a href="tel:+61451270951" className="flex items-center gap-2 text-slate-300 px-3 py-2 cursor-pointer">
                 <Phone className="h-5 w-5" />
-                <span className="font-medium">0400 000 000</span>
+                <span className="font-medium">0451 270 951</span>
               </a>
               <div className="mt-3 px-3">
                 <Link to="/booking" onClick={() => setIsOpen(false)} className="cursor-pointer">

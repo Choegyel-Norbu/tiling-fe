@@ -55,11 +55,11 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-accent shrink-0" />
-                <span>Serving Greater Sydney & Surrounds<br/>NSW, Australia</span>
+                <span>Perth Western Australia</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-accent shrink-0" />
-                <a href="tel:+61400000000" className="hover:text-accent">0400 000 000</a>
+                <a href="tel:+61451270951" className="hover:text-accent">0451 270 951</a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-accent shrink-0" />

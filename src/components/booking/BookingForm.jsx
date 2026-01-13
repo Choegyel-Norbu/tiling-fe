@@ -614,7 +614,7 @@ export function BookingForm({ onSubmitted }) {
                                   validate: v => !v || isValidAustralianPhone(v) || 'Invalid phone'
                                 })}
                                 className="w-full pl-11 h-12 rounded-xl border border-slate-200 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all bg-slate-50 focus:bg-white"
-                                placeholder="0400 000 000"
+                                placeholder="0451 270 951"
                               />
                             </div>
                             {errors.phone && <p className="text-red-500 text-xs mt-1 ml-1">{errors.phone.message}</p>}
