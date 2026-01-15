@@ -1,95 +1,105 @@
 import React from 'react';
-import { Shield, Award, Users, CheckCircle } from 'lucide-react';
-import { PageHeader } from '../components/layout/PageHeader';
+import { ArrowRight } from 'lucide-react';
+import { Button } from '../components/ui/Button';
+import { Link } from 'react-router-dom';
+import { ContactSection } from '../components/layout/ContactSection';
 
 export function About() {
+  const team = [
+    {
+      name: "Rinchen Dorji",
+      role: "Lead Tiler",
+      image: "/leadtiler.jpeg",
+      bio: "Lead tiler with extensive hands-on experience across residential and commercial projects."
+    },
+    {
+      name: "Tandin Norbu",
+      role: "Tiler",
+      image: "/leadtiling1.jpeg",
+      bio: "Detail-focused tiler specialising in waterproofing and precise finishes."
+    },
+    {
+      name: "Tshering",
+      role: "Tiler",
+      image: "/tiling1.jpeg",
+      bio: "Experienced tiler dedicated to clean lines and durable workmanship."
+    }
+  ];
+
   return (
-    <div className="bg-white min-h-screen">
-     
+    <div className="bg-white min-h-screen font-sans text-slate-900">
+      
+      {/* 1. Hero / Header Section */}
+      <section className="pt-10 pb-16 md:pt-22 md:pb-24 text-center px-4 max-w-5xl mx-auto">
+        <div className="flex items-center justify-center gap-2 mb-6">
+            <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-600">
+                <span className="mr-2 h-2 w-2 rounded-full bg-accent"></span>
+                Our team
+            </span>
+        </div>
+        
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1]">
+          We’ve got an <span className="relative inline-block text-accent">
+            entire team
+            <svg className="absolute w-full h-3 -bottom-1 left-0 text-accent/20" viewBox="0 0 100 10" preserveAspectRatio="none">
+                 <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" />
+            </svg>
+          </span> dedicated to building your dream space.
+        </h1>
+        
+        <p className="text-sm md:text-base text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+          From master tilers to project managers, get the support you need for your renovation journey. We're here to help you transform your home.
+        </p>
 
-      {/* Story */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row gap-12 items-center">
-            <div className="md:w-1/2">
-               <img 
-                 src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=1000" 
-                 alt="Tiling Team" 
-                 className="rounded-lg shadow-xl"
-               />
-            </div>
-            <div className="md:w-1/2">
-              <h2 className="text-3xl font-bold text-slate-900 mb-6">Our Story</h2>
-              <div className="space-y-4 text-slate-600 leading-relaxed">
-                <p>
-                  Himalayan Tiling began with a simple mission: to provide Australian homeowners with tiling services they could actually rely on. 
-                  Founded by master tiler John Smith, we grew from a one-man operation to a dedicated team of certified professionals.
-                </p>
-                <p>
-                  We understand that inviting tradespeople into your home requires trust. That's why we prioritize communication, cleanliness, and punctuality just as much as the quality of our tiling.
-                </p>
-                <p>
-                  Over the last 15 years, we've completed over 2,000 projects across Sydney, ranging from small splashback repairs to luxury bathroom renovations.
-                </p>
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link to="/booking">
+            <Button size="lg" className="h-12 px-8 text-base bg-slate-900 text-white hover:bg-slate-800 rounded-full">
+              Book a consultation
+            </Button>
+          </Link>
+          <Button
+            variant="outline"
+            size="lg"
+            className="h-12 px-8 text-base border-slate-300 text-slate-700 hover:bg-slate-50 rounded-full"
+            onClick={() => {
+              const el = document.getElementById('about-contact');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          >
+            Get in touch
+          </Button>
         </div>
       </section>
 
-      {/* Values/Stats */}
-      <section className="bg-slate-50 py-16">
+      {/* 2. Team Carousel Section */}
+      <section className="py-12 border-y border-slate-100 bg-slate-50/50">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-               <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                 <Shield className="h-8 w-8 text-accent" />
-               </div>
-               <h3 className="text-xl font-bold mb-2">Licensed & Insured</h3>
-               <p className="text-slate-600">
-                 Fully licensed (Lic: 123456C) and carrying $20M Public Liability Insurance for your peace of mind.
-               </p>
-            </div>
-            <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-               <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                 <Award className="h-8 w-8 text-accent" />
-               </div>
-               <h3 className="text-xl font-bold mb-2">Quality Guarantee</h3>
-               <p className="text-slate-600">
-                 We stand by our work with a 7-year workmanship warranty on all waterproofing and tiling.
-               </p>
-            </div>
-            <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-               <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                 <Users className="h-8 w-8 text-accent" />
-               </div>
-               <h3 className="text-xl font-bold mb-2">Expert Team</h3>
-               <p className="text-slate-600">
-                 Our team consists of qualified tradespeople, not unskilled subcontractors.
-               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Certifications */}
-      <section className="py-16 text-center">
-         <div className="container mx-auto px-4">
-           <h2 className="text-2xl font-bold text-slate-900 mb-8">Our Credentials</h2>
-           <div className="flex flex-wrap justify-center gap-8 md:gap-16 items-center opacity-70 grayscale hover:grayscale-0 transition-all">
-              {/* Mock Logos */}
-              <div className="flex items-center gap-2 font-bold text-slate-800 text-xl border-2 border-slate-800 p-2 rounded">
-                Housing Industry Association
-              </div>
-              <div className="flex items-center gap-2 font-bold text-slate-800 text-xl border-2 border-slate-800 p-2 rounded">
-                Master Builders
-              </div>
-              <div className="flex items-center gap-2 font-bold text-slate-800 text-xl border-2 border-slate-800 p-2 rounded">
-                SafeWork NSW
-              </div>
+           {/* Team Members - Centered and Smaller */}
+           <div className="flex flex-wrap justify-center gap-8 md:gap-12">
+              {team.map((member, index) => (
+                 <div key={index} className="relative bg-white w-full max-w-[240px] aspect-[4/5] flex flex-col justify-end shadow-sm">
+                    <img 
+                      src={member.image} 
+                      alt={member.name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="relative z-10 bg-white p-3 m-3 shadow-sm border border-slate-100 rounded-lg">
+                       <h3 className="font-bold text-slate-900 text-sm">{member.name}</h3>
+                       <p className="text-accent text-sm font-medium">{member.role}</p>
+                    </div>
+                 </div>
+              ))}
            </div>
-         </div>
+        </div>
       </section>
+
+      {/* 3. Contact & Form Section (shared with Contact page) */}
+      <section id="about-contact" className="bg-white">
+        <ContactSection />
+      </section>
+
     </div>
   );
 }

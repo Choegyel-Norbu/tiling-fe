@@ -213,9 +213,8 @@ export function Gallery() {
                           <div className="absolute inset-0 opacity-20">
                             <div className="w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-accent/20 via-slate-700/30 to-slate-900" />
                           </div>
-                          <div className="relative z-10 flex flex-col items-center gap-4">
+                          <div className="relative z-10 flex items-center justify-center">
                             <Loader2 className="w-12 h-12 text-white animate-spin" />
-                            <p className="text-white/80 text-sm font-medium">Loading video...</p>
                           </div>
                         </div>
                       )}
@@ -283,8 +282,6 @@ export function Gallery() {
                             onClick={(e) => {
                               e.stopPropagation();
                               const shareData = {
-                                title: video.title,
-                                text: video.description,
                                 url: window.location.href,
                               };
                               
