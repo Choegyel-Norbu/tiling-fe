@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d97706;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b45309;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#grad)"/>
+  <!-- Tile pattern - representing tiling work -->
+  <g fill="#ffffff" opacity="0.95">
+    <!-- Top row of tiles -->
+    <rect x="20" y="20" width="18" height="18" rx="2"/>
+    <rect x="41" y="20" width="18" height="18" rx="2"/>
+    <rect x="62" y="20" width="18" height="18" rx="2"/>
+    <!-- Middle row of tiles -->
+    <rect x="20" y="41" width="18" height="18" rx="2"/>
+    <rect x="41" y="41" width="18" height="18" rx="2"/>
+    <rect x="62" y="41" width="18" height="18" rx="2"/>
+    <!-- Bottom row of tiles -->
+    <rect x="20" y="62" width="18" height="18" rx="2"/>
+    <rect x="41" y="62" width="18" height="18" rx="2"/>
+    <rect x="62" y="62" width="18" height="18" rx="2"/>
+  </g>
+  <!-- H letter overlay for Himalayan -->
+  <text x="50" y="65" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#d97706" text-anchor="middle">H</text>
+</svg>
+

@@ -32,14 +32,14 @@ const testimonials = [
   },
   {
     tempId: 4,
-    testimonial: "If I could give 11 stars, I'd give 12. Best tiling service in Sydney, hands down.",
+    testimonial: "If I could give 11 stars, I'd give 12. Best tiling service in Perth, hands down.",
     by: "Jennifer L., Surry Hills",
     imgSrc: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face"
   },
   {
     tempId: 5,
     testimonial: "SO SO SO HAPPY WE FOUND YOU GUYS!!!! I'd bet you've saved me 100 hours so far. Professional and efficient!",
-    by: "Robert P., North Sydney",
+    by: "Robert P., North Perth",
     imgSrc: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
   },
   {

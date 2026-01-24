@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Link } from 'react-router-dom';
 import { ContactSection } from '../components/layout/ContactSection';
+import { SEO, SEO_CONFIG } from '../components/utils/SEO';
 
 export function About() {
   const team = [
@@ -28,6 +29,7 @@ export function About() {
 
   return (
     <div className="bg-white min-h-screen font-sans text-slate-900">
+      <SEO {...SEO_CONFIG.about} />
       
       {/* 1. Hero / Header Section */}
       <section className="pt-10 pb-16 md:pt-22 md:pb-24 text-center px-4 max-w-5xl mx-auto">

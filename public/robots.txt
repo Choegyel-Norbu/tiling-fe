@@ -1,0 +1,28 @@
+# Robots.txt for himalayantiling.com
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+
+# Disallow protected/admin areas
+Disallow: /admin
+Disallow: /my-bookings
+
+# Sitemap location
+Sitemap: https://himalayantiling.com/sitemap.xml
+
+# Crawl delay (optional - be nice to servers)
+Crawl-delay: 1
+
+# Google-specific
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /my-bookings
+
+# Bing-specific
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /my-bookings
+

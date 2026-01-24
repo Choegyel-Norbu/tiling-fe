@@ -1,10 +1,12 @@
 import React from 'react';
 import { Star, Quote } from 'lucide-react';
 import { reviews } from '../data/reviews';
+import { SEO, SEO_CONFIG } from '../components/utils/SEO';
 
 export function Reviews() {
   return (
     <div className="bg-white min-h-screen">
+      <SEO {...SEO_CONFIG.reviews} />
       <section className="bg-secondary text-white py-16 text-center">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold mb-4">Client Reviews</h1>
@@ -60,7 +62,7 @@ export function Reviews() {
                    </div>
                    <div>
                      <p className="font-bold text-slate-900">Anonymous</p>
-                     <p className="text-xs text-slate-500">Sydney</p>
+                     <p className="text-xs text-slate-500">Perth</p>
                    </div>
                 </div>
               </div>

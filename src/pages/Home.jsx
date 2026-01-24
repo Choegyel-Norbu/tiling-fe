@@ -11,6 +11,7 @@ import { StaggerTestimonials } from '../components/ui/stagger-testimonials';
 import { useScreenSize } from '../hooks/use-screen-size';
 import { reviews } from '../data/reviews';
 import { projects } from '../data/projects';
+import { SEO, SEO_CONFIG } from '../components/utils/SEO';
 
 const features = [
   {
@@ -65,6 +66,7 @@ export function Home() {
 
   return (
     <div className="flex flex-col w-full">
+      <SEO {...SEO_CONFIG.home} />
       {/* Hero Section */}
       <section className="relative h-[85vh] min-h-[600px] flex items-center overflow-hidden bg-white">
         {/* Retro Grid Background */}
@@ -77,7 +79,7 @@ export function Home() {
             {/* Trust Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/30 text-accent font-semibold text-sm mb-8 backdrop-blur-sm">
               <Star className="w-4 h-4 fill-current" />
-              <span>#1 Rated Tiling Specialists in Sydney</span>
+              <span>#1 Rated Tiling Specialists in Perth</span>
             </div>
 
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight tracking-tight">
@@ -125,7 +127,7 @@ export function Home() {
               <div className="flex items-center gap-3">
                 <CheckCircle className="h-6 w-6 text-accent" />
                 <div>
-                  <span className="block text-slate-900 font-semibold">7 Year Warranty</span>
+                  <span className="block text-slate-900 font-semibold">1 Year Warranty</span>
                   <span className="text-xs text-slate-500">On All Workmanship</span>
                 </div>
               </div>

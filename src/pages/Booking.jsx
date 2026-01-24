@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { Dialog } from '../components/ui/Dialog';
 import { Loader2, User, AlertCircle } from 'lucide-react';
+import { SEO, SEO_CONFIG } from '../components/utils/SEO';
 
 export function Booking() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -91,6 +92,7 @@ export function Booking() {
   // If there's an error detecting location or country is AU, check authentication
   return (
     <>
+      <SEO {...SEO_CONFIG.booking} />
       {/* Only show booking form if authenticated */}
       {isAuthenticated ? (
         <div className="bg-slate-50 min-h-screen py-12">

@@ -127,7 +127,7 @@ export default function CaseStudies() {
         "https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&q=80&w=800",
       icon: CheckCircle,
       metrics: [
-        { value: "500+", label: "Happy Clients", sub: "Across Greater Sydney" },
+        { value: "500+", label: "Happy Clients", sub: "Across Greater Perth" },
         { value: "0", label: "Hidden Fees", sub: "Guaranteed fixed pricing" },
       ],
     },

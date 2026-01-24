@@ -6,6 +6,7 @@ import { cn } from '../utils/cn';
 import { MapPin, Calendar, ZoomIn, ArrowRight, Play, X, Pause, Volume2, VolumeX, Loader2, Share2, Calendar as CalendarIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useScreenSize } from '../hooks/use-screen-size';
+import { SEO, SEO_CONFIG } from '../components/utils/SEO';
 
 const categories = ['All', 'Video', 'Shorts', 'Bathroom', 'Living Room', 'Corridors & Stairs', 'Waterproofing'];
 
@@ -116,6 +117,7 @@ export function Gallery() {
 
   return (
     <div className="bg-slate-50 min-h-screen font-sans">
+      <SEO {...SEO_CONFIG.gallery} />
 
       {/* Filter Section */}
       <section className={cn(
@@ -384,12 +386,8 @@ export function Gallery() {
               )}
               <div className="space-y-4">
                 {videos.map((video) => (
-                  <motion.div
+                  <div
                     key={video.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
                     className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => setSelectedVideo(video)}
                   >
@@ -417,7 +415,7 @@ export function Gallery() {
                         </p>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -425,89 +423,81 @@ export function Gallery() {
 
           {/* Projects Grid - Hidden on mobile when showing videos separately */}
           {!(isMobile && activeFilter === 'Video') && (
-            <motion.div 
-              layout
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              <AnimatePresence>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              
                 {/* Projects */}
                 {filteredProjects.map((project) => (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
+                <div
                   key={project.id}
-                  className="group relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full"
+                  className="group relative overflow-hidden cursor-pointer"
+                  onClick={() => setSelectedImage(project)}
                 >
                   {/* Image Container */}
-                  <div className="relative aspect-[4/3] overflow-hidden cursor-pointer" onClick={() => setSelectedImage(project)}>
+                  <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 shadow-lg hover:shadow-2xl transition-all duration-500">
                     {project.type === 'renovation' ? (
-                      <div className="relative w-full h-full group-hover:scale-105 transition-transform duration-700">
-                        {/* Split view for renovation: 50/50 diagonal or simple side-by-side */}
+                      <div className="relative w-full h-full">
+                        {/* Split view for renovation */}
                          <div className="absolute inset-0 flex">
-                            <div className="w-1/2 h-full relative border-r border-white/20">
-                              <img src={project.imageBefore} alt="Before" className="w-full h-full object-cover" />
-                              <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-md tracking-wider">BEFORE</div>
-                            </div>
                             <div className="w-1/2 h-full relative">
-                              <img src={project.imageAfter} alt="After" className="w-full h-full object-cover" />
-                              <div className="absolute top-3 right-3 bg-green-500/90 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-md tracking-wider">AFTER</div>
+                              <img src={project.imageBefore} alt="Before" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                              <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                                BEFORE
+                              </div>
+                            </div>
+                            <div className="w-1/2 h-full relative border-l border-white/30">
+                              <img src={project.imageAfter} alt="After" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                              <div className="absolute top-4 right-4 bg-emerald-500/90 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                                AFTER
+                              </div>
                             </div>
                          </div>
                       </div>
                     ) : (
-                      <div className="w-full h-full relative group-hover:scale-105 transition-transform duration-700">
-                        <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+                      <div className="w-full h-full relative">
+                        <img src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                       </div>
                     )}
                     
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <Button variant="outline" className="text-black border-white hover:bg-white hover:text-black gap-2">
-                        <ZoomIn className="w-4 h-4" /> View Details
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6 flex flex-col flex-grow">
-                    <div className="mb-4">
-                      <span className="text-xs font-bold text-blue-600 uppercase tracking-wider bg-blue-50 px-2 py-1 rounded-md">
+                    {/* Category Badge */}
+                    <div className="absolute top-4 left-4">
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-white/90 backdrop-blur-sm text-slate-800 shadow-lg">
                         {project.category}
                       </span>
                     </div>
-                    
-                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
-                      {project.title}
-                    </h3>
-                    <p className="text-slate-600 text-sm mb-6 line-clamp-2 flex-grow">
-                      {project.description}
-                    </p>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                        <MapPin className="w-3.5 h-3.5" />
-                        {project.suburb}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                        <Calendar className="w-3.5 h-3.5" />
-                        {project.duration}
+                    {/* Bottom Info Overlay */}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                      <div className="flex items-end justify-between text-white">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-lg mb-1 truncate">{project.title}</h3>
+                          <div className="flex items-center gap-4 text-sm text-white/80">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3.5 h-3.5" />
+                              {project.suburb}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3.5 h-3.5" />
+                              {project.duration}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+                          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors">
+                            <ZoomIn className="w-5 h-5 text-white" />
+                          </div>
+                        </div>
                       </div>
                     </div>
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
-                </motion.div>
+                </div>
               ))}
 
               {/* Videos - Desktop/Tablet Grid View */}
               {showVideos && !isMobile && videos.map((video) => (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
+                <div
                   key={video.id}
                   className="group relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full"
                 >
@@ -531,30 +521,29 @@ export function Gallery() {
                     </div>
                     
                     {/* Video Badge */}
-                    <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-md tracking-wider">
+                    {/* <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-md tracking-wider">
                       VIDEO
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Content */}
                   <div className="p-6 flex flex-col flex-grow">
-                    <div className="mb-4">
+                    {/* <div className="mb-4">
                       <span className="text-xs font-bold text-red-600 uppercase tracking-wider bg-red-50 px-2 py-1 rounded-md">
                         Video
                       </span>
-                    </div>
+                    </div> */}
                     
-                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-red-600 transition-colors">
+                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
                       {video.title}
                     </h3>
                     <p className="text-slate-600 text-sm mb-6 line-clamp-2 flex-grow">
                       {video.description}
                     </p>
                   </div>
-                </motion.div>
+                </div>
                 ))}
-              </AnimatePresence>
-            </motion.div>
+            </div>
           )}
 
           {filteredProjects.length === 0 && activeFilter !== 'Video' && !(isMobile && activeFilter === 'Video') && (

@@ -33,7 +33,7 @@ export const mockBookings = [
     status: 'Cancelled',
     date: '2023-10-20',
     amount: '$1,200',
-    location: 'Sydney CBD'
+    location: 'Perth CBD'
   },
 ];
 

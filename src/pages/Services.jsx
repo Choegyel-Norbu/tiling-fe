@@ -5,6 +5,7 @@ import { Check, Clock, Hammer, ArrowRight, X, ChevronRight, Star } from 'lucide-
 import { Button } from '../components/ui/Button';
 import { services } from '../data/services';
 import tiling2Image from '../assets/images/tiling2 (2).jpeg';
+import { SEO, SEO_CONFIG } from '../components/utils/SEO';
 
 // Service image mapping
 const serviceImages = {
@@ -155,6 +156,7 @@ export function Services() {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEO {...SEO_CONFIG.services} />
       {/* Hero Section */}
       <section className="relative pt-32 pb-16 lg:pt-48 lg:pb-32 overflow-hidden bg-slate-900 text-white">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620626012053-1c1adc32d000?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
