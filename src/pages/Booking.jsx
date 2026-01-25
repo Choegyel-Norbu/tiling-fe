@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { BookingForm } from '../components/booking/BookingForm';
-// COMMENTED OUT: ServiceNotAvailable import - uncomment when re-enabling IP filter
-// import { ServiceNotAvailable } from '../components/booking/ServiceNotAvailable';
-// COMMENTED OUT: useGeolocation hook - uncomment when re-enabling IP filter
-// import { useGeolocation } from '../hooks/useGeolocation';
+import { ServiceNotAvailable } from '../components/booking/ServiceNotAvailable';
+import { useGeolocation } from '../hooks/useGeolocation';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { Dialog } from '../components/ui/Dialog';
@@ -19,22 +17,17 @@ export function Booking() {
   const navigate = useNavigate();
   
   // ============================================================================
-  // AUSTRALIA-ONLY IP FILTER - COMMENTED OUT (Temporarily disabled)
+  // AUSTRALIA-ONLY IP FILTER - ENABLED
   // ============================================================================
   // This geolocation check restricts booking access to Australian users only.
-  // To re-enable: Uncomment the useGeolocation hook and the country checks below.
   // ============================================================================
-  // const { country, isLoading: isGeolocationLoading } = useGeolocation();
-  const country = null; // Set to null to bypass country check
-  const isGeolocationLoading = false; // Set to false to skip loading state
+  const { country, isLoading: isGeolocationLoading } = useGeolocation();
   
   const { isAuthenticated, login, isLoading: isAuthLoading } = useAuth();
   const { showToast } = useToast();
 
   // Show loading state while detecting location or checking auth
-  // COMMENTED OUT: Geolocation loading check - uncomment to re-enable IP filtering
-  // if (isGeolocationLoading || isAuthLoading) {
-  if (isAuthLoading) {
+  if (isGeolocationLoading || isAuthLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
@@ -46,16 +39,15 @@ export function Booking() {
   }
 
   // ============================================================================
-  // AUSTRALIA-ONLY RESTRICTION - COMMENTED OUT (Temporarily disabled)
+  // AUSTRALIA-ONLY RESTRICTION - ENABLED
   // ============================================================================
   // This check shows "Service Not Available" page for non-Australian users.
-  // To re-enable: Uncomment the code below and restore the useGeolocation hook above.
+  // AU is the country code for Australia
   // ============================================================================
   // Show "Service Not Available" if user is not from Australia
-  // AU is the country code for Australia
-  // if (country && country !== 'AU') {
-  //   return <ServiceNotAvailable country={country} />;
-  // }
+  if (country && country !== 'AU') {
+    return <ServiceNotAvailable country={country} />;
+  }
 
   // Handle Google login success
   const handleLoginSuccess = async (credentialResponse) => {
@@ -123,11 +115,9 @@ export function Booking() {
         <div className="bg-slate-50 min-h-screen" />
       )}
 
-      {/* Show login dialog if not authenticated */}
-      {/* COMMENTED OUT: Country check - previously only showed for Australian users */}
-      {/* To re-enable IP filtering: Change condition to: !isAuthenticated && (country === 'AU' || !country) */}
+      {/* Show login dialog if not authenticated (only for Australian users) */}
       <Dialog
-        isOpen={!isAuthenticated}
+        isOpen={!isAuthenticated && (country === 'AU' || !country)}
         onClose={handleClose}
         title=""
         showCloseButton={true}
