@@ -5,6 +5,7 @@ import { Layout } from './components/layout/Layout';
 import ScrollToTop from './components/utils/ScrollToTop';
 import { useAuth } from './context/AuthContext';
 import { useToast } from './context/ToastContext';
+import { isInAppBrowser } from './utils/inAppBrowser';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AdminRoute } from './components/auth/AdminRoute';
 
@@ -35,8 +36,9 @@ function App() {
     onError: () => {
       console.log('Google One Tap Auth Failed');
     },
-    // Don't show One Tap while checking auth or if already logged in
-    disabled: isLoading || isAuthenticated,
+    // Don't show One Tap while checking auth, if already logged in,
+    // or if inside an in-app browser (WebView) where it won't work
+    disabled: isLoading || isAuthenticated || isInAppBrowser(),
   });
 
   return (
