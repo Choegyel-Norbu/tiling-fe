@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useScreenSize } from '../hooks/use-screen-size';
 import { SEO, SEO_CONFIG } from '../components/utils/SEO';
 
-const categories = ['All', 'Video', 'Shorts', 'Bathroom', 'Living Room', 'Corridors & Stairs', 'Waterproofing'];
+const categories = ['All', 'Video', 'Shorts', 'Bathroom', 'Kitchen', 'Living Room', 'Corridors & Stairs', 'Waterproofing'];
 
 const videos = [
   {
@@ -624,13 +624,6 @@ export function Gallery() {
                   </p>
 
                   <div className="space-y-4 mb-8">
-                    <div className="flex items-center p-3 bg-slate-50 rounded-lg">
-                      <MapPin className="w-5 h-5 text-slate-400 mr-3" />
-                      <div>
-                        <p className="text-xs text-slate-500 uppercase font-bold">Location</p>
-                        <p className="text-sm font-medium text-slate-900">{selectedImage.suburb}</p>
-                      </div>
-                    </div>
                     <div className="flex items-center p-3 bg-slate-50 rounded-lg">
                       <Calendar className="w-5 h-5 text-slate-400 mr-3" />
                       <div>

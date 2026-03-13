@@ -101,7 +101,7 @@ export function SEO({
 export const SEO_CONFIG = {
   home: {
     title: null, // Uses default
-    description: "Perth's #1 rated tiling specialists. Expert bathroom renovations, waterproofing, screeding, grouting & vinyl flooring installation. 7-year warranty. Free inspections. Fully licensed.",
+    description: "Perth's #1 rated tiling specialists. Expert bathroom renovations, waterproofing, screeding, grouting & vinyl flooring installation. 1-year warranty. Free inspections. Fully licensed.",
     canonical: '/',
   },
   services: {

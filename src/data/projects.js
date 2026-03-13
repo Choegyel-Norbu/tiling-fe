@@ -128,5 +128,25 @@ export const projects = [
     image: "/corridors2.jpeg",
     description: "Continuous tiling flow connecting living areas through the main corridor.",
     duration: "3 days"
+  },
+  {
+    id: 17,
+    title: "Modern Kitchen Splashback",
+    category: "Kitchen",
+    suburb: "Leederville",
+    type: "showcase",
+    image: "/ktchen&splashback.jpeg",
+    description: "Sleek tiled kitchen splashback providing an easy-to-clean, stylish focal point.",
+    duration: "3 days"
+  },
+  {
+    id: 19,
+    title: "Floor Screeding & Preparation",
+    category: "Waterproofing",
+    suburb: "Mount Lawley",
+    type: "showcase",
+    image: "/screeding.jpeg",
+    description: "Professional screeding to create a level, properly drained base ready for tiling.",
+    duration: "1 day"
   }
 ];

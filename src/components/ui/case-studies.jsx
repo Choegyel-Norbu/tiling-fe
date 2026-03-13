@@ -108,13 +108,13 @@ export default function CaseStudies() {
     {
       id: 2,
       quote:
-        "All our work complies with Australian Standards and comes with a 7-year workmanship warranty for your peace of mind.",
+        "All our work complies with Australian Standards and comes with a 1-year workmanship warranty for your peace of mind.",
       title: "Quality Guaranteed",
       image:
         "https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=800",
       icon: Shield,
       metrics: [
-        { value: "7yr", label: "Warranty", sub: "On all waterproofing" },
+        { value: "1yr", label: "Warranty", sub: "On all waterproofing" },
         { value: "100%", label: "Certified", sub: "Licensed tradespeople" },
       ],
     },
